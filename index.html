@@ -103,8 +103,8 @@ h1 { text-align: center; font-size: 1.6em; }
 <div class="container">
   <h1>🎄 Algo especial está guardado aqui 🎁 </h1>
   <div class="contador" id="contador"></div>
-  <div id="mensagem"></div>
-  <button id="revealButton">🎁 Revelar Mensagem</button>
+  <div id="mensagem"><p class="hidden">"por texto codificado aqui..."</p></div>
+  <button id="revealButton">▶ Ouvir Música 🎵</button>
 </div>
 
 <!-- Debug -->
@@ -122,7 +122,6 @@ const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
 const storageKey = "mensagemRevelada";
 
 // ================= TEXTOS =================
-const textoCifrado = `"aqui texto codificado aqui..."`;
 const linhas = [
   "por texto aqui",
   "por texto aqui",
@@ -148,11 +147,6 @@ audioReveal.src = "reveal.mp3";
 function atualizar(){
   const agora = new Date();
 
-  // Mostra texto cifrado antes da revelação
-  if(!revelando){
-    mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
-  }
-
   // Contador regressivo
   const diff = dataLiberacao - agora;
   const d=Math.floor(diff/1000/60/60/24);
@@ -162,6 +156,7 @@ function atualizar(){
 
   if(agora >= dataLiberacao && !revelando){
     contador.innerHTML="✨ A mensagem foi revelada ✨";
+    iniciarRevelacao();
   } else {
     contador.innerHTML=`⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
   }
@@ -176,11 +171,10 @@ let linhaAtual=0,charAtual=0,textoAtual="",decodificando=false;
 function iniciarRevelacao(){
   const agora = new Date();
   if(revelando) return;
-
-  if(agora < dataLiberacao && !debugForcar) return; // Bloqueia antes da data oficial
+  if(agora < dataLiberacao && !debugForcar) return; // só oficial na data
 
   revelando = true;
-  localStorage.setItem(storageKey,"true"); // só altera após revelar oficialmente
+  localStorage.setItem(storageKey,"true"); // altera após revelação oficial
   mensagem.textContent="";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
@@ -209,7 +203,7 @@ function digitarTexto(){
             decodificando=false;
             digitarTexto();
           }
-        },20); // mais rápido
+        },20); // digitação rápida
       }
     } else {
       textoAtual+="\n\n";
@@ -245,22 +239,23 @@ setInterval(criarNeve,350);
 document.getElementById("debugInput").addEventListener("keydown",(e)=>{
   if(e.key==="Enter"){
     if(e.target.value.trim().toLowerCase()==="flor de gyovana"){
-      debugForcar=true; // só ativa temporariamente
+      debugForcar=true;
       e.target.value="";
       e.target.placeholder="✔ comando aceito";
     } else e.target.value="";
   }
 });
 
-// ================= BOTÃO REVELAR =================
+// ================= BOTÃO AUTOPLAY =================
 revealButton.addEventListener("click",()=>{
   audioBackground.play().catch(()=>{});
-  iniciarRevelacao(); // só revela se data já chegou ou debug temporário
+  // prepara áudio de revelação, mas não revela texto
+  audioReveal.load();
 });
 
 // ================= INICIAL =================
 if(localStorage.getItem(storageKey)==="true"){
-  iniciarRevelacao(); // mantém revelado se já passado oficialmente
+  iniciarRevelacao(); // mantém revelado se já passou
 } else {
   setInterval(atualizar,1000);
   atualizar();
