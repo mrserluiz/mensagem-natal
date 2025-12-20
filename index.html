@@ -6,7 +6,6 @@
 <title>🎄 Uma Mensagem está esperando por você 🎄</title>
 
 <style>
-
 body {
   margin: 0;
   background: radial-gradient(circle at top, #132f22, #030b06);
@@ -44,12 +43,7 @@ p {
 }
 
 .hidden {
-  opacity: 0.15;
-}
-
-.linha {
-  opacity: 0;
-  animation: fadeIn 2.5s forwards;
+  opacity: 0.18;
 }
 
 .assinatura {
@@ -66,7 +60,14 @@ p {
   animation: blink 1s infinite;
 }
 
-  #debugBox {
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* DEBUG */
+#debugBox {
   position: fixed;
   bottom: 12px;
   left: 12px;
@@ -74,10 +75,7 @@ p {
   transition: opacity 0.3s ease;
   z-index: 999;
 }
-
-#debugBox:hover {
-  opacity: 1;
-}
+#debugBox:hover { opacity: 1; }
 
 #debugInput {
   background: rgba(0,0,0,0.6);
@@ -87,19 +85,7 @@ p {
   font-size: 0.8em;
   border-radius: 6px;
   outline: none;
-  width: 160px;
-}
-
-  
-@keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  width: 170px;
 }
 
 /* NEVE */
@@ -129,83 +115,37 @@ p {
 <body>
 
 <div class="container">
-  <h1>🎄 Algo especial está guardado aqui 🎁 </h1>
+  <h1>🎄 Algo especial está guardado aqui 🎁</h1>
   <div class="contador" id="contador"></div>
   <div id="mensagem"></div>
 </div>
 
+<div id="debugBox">
+  <input type="text" id="debugInput" placeholder="⌘ comando secreto">
+</div>
+
 <script>
 // ================= DATA =================
-const agora = new Date();
-const dataLiberacao = new Date(agora.getFullYear(), 11, 25, 0, 1, 0);
+const agoraInicial = new Date();
+const dataLiberacao = new Date(agoraInicial.getFullYear(), 11, 25, 0, 1, 0);
 
-// ================= TEXTOS =================
-const textoCifrado =
+// ================= TEXTO CIFRADO =================
+const textoCifrado = [
+  "Jó fócz ra ykdf oco wd yfbmzje t qf hhvuzra zy mcsso ptyo.",
+  "Czsks hqt qbt tchg vvtt eukpbcra, fqpfyo avtrdzmrr.",
+  "Cqx yjcvz xrsgrg ztbgvxs, rmv jgbsz fvhbs bfe iqx et pzg.",
+  "Vxfrd lbgzy tbê wz dgsxk, fgz wt gpmpfe akpôqqc.",
+  "Jpwsr ts rpuo g fzycmu vyxkbwt tzgnwgg trr uqbvzm."
+];
 
-`"Jó fócz ra ykdf oco wd yfbmzje t qf hhvuzra zy mcsso ptyo.",
-"Czsks hqt qbt tchg vvtt eukpbcra, fqpfyo avtrdzmrr.",
-"Cqx yjcvz xrsgrg ztbgvxs, rmv jgbsz fvhbs bfe iqx et pzg, cs zkcfs fgqf izq ypgqk oc vkncs csgxv.",
-"Vxfrd lbgzy tbê wz dgsxk, fgz wt gpmpfe akpôqqc, fgz wt vzftff fnhbzdtzt.",
-"Jpwsr ts rpuo g fzycmu vyxkbwt tzgnwgg trr uqbvzm, rq dvmfrfc, rq mccyprz, rq sfytrdse vtsky.",
-"Dmsd jq tgbdm vbtfzhq jgcrqz cst hspt ds brgpx, rq hyyzt xqbb rglz gj vgrc.",
-"Rq thhzfg fzxx z ggszrfc tgx xrfcmf ts ftppq, cs gzoqr à etvxfêozz.",
-"Çvê rq jwv gqgq hv zrs wkqw lffy gvtgxtf y kf lszd ffyy xgsnvgg qhsyq bbrfyx.",
-"D zlb cs vksdb bfy p bb xzr gqvygvv z mtjcs.",
-"Sg vtfxzqs ph xgvqyyvr, xt rfrlt, rfd rq vpcê qgrz.",
-"Zvhq gkmz kvm rz zlrwx xrd q mvm rbl ptzq z gqj ty qzqy.",
-"T zzê dsdyl gr wfbivv mlf tpp hiy, rmts xt xppss yxxz btp hdhvsy wrn hcfkq zgzav.",
-"Jdkq zârz vrxt pq dvpxs z qk xr hswnfqfzw dvw jxxtvvx.",
-"Fqg rzct dmtxg x bts bts fypbhksl, xypdss wpzyrg sg vtgntgg hdbfyx.",
-"Vjfq sb wgdvtrb wv tzhvcyx bxs tvyynzr wgsx vkpzh fws zsvm tfdçvv bppfpz jtyjvqhz rq hskwm.",
-"Jtswb pprfdy.",
-"Qd zgzxz ztqz dzhx zy bzxw vyxlhhs, ztdfrg az xwspjbrf jgfr.",
-"Fqzjtyx avds, vmvbfv ksdz jskkbf b khffbf.",
-"Tnyzf x bfe ztkp, tyvqx vgmghf t bggvryx xgrz qk vgtczw.",
-"Cvrh fz qyppbb tv dtxzsz fzxx fvrkbh tbt hdfcttzv.",
-"Rzygr jfkz, sx fzdfe bvrfdg.",
-"Stpvv rfd rp wbg jgpc ptyo uqjv, whldg tgbx fqpfhs.",
-"Hfszgt qg qkzddr jgfrz, ngfr ggm czx ds kpbqpzz.",
-"Fhgz rz zssbgpdtf.",
-"Hsd zsnxzqz pqx aofê dzn lzzf z bgdcm kgg kgyv.",
-"Bb ztqzf gvdzhx, zxxc.",
-"Jx qxpjwbbf xrd gzdgm fvpdrs jgfrz.",
-"Jtswb zdkp qzjv fbgxtgyv tppfpz pgrz, gyljz t fzxxzqv.",
-"Xg zdgvt zshqz qk bts bts jgfrz.",
-"M hx wfpfxk zpwxr vchbg, fbgcszq ts tsr bfdj qthx.",
-"Hyqlcf tzsssfq z vvrhtf wrn bgdj zthzrg, ggm zs mxry zpsf.",
-"Zgkz Xksrz, zg tbgdvt fzhbgg gsp ztqz trgsxk zvr lzjh.",
-"Ksw jgfrz rzqv tdx tgpdrt pwg gk.",
-"Vdkz jgfrz bfe zs bzkdr gspg pqf gkdvftz, pzqrfkz, zfê gkdvftz.",
-"Jdkq zvr lzjh.",
-`;
-
+// ================= TEXTO REAL =================
 const linhas = [
-"Há algo em você que me acalma e me desarma ao mesmo tempo.",
-"Algo que não pede explicação, apenas presença.",
-"Nos seus gestos simples e nas suas mensagens do dia a dia, encontro um lugar seguro.",
-"No jeito leve com que você entra na minha rotina, eu me sinto em casa.",
-"Quando penso em você, não penso em perfeição, penso nas suas falas verdadeiras.",
-"Gosto de como a nossa história acontece sem pressa, no cuidado e na atenção.",
-"Nas pequenas coisas do dia a dia, você me deixa chegar à sua vida.",
-"Nos risos fora de hora e nas noites cansadas que terminam em carinho, mesmo à distância.",
-"Até nos dias em que o sono vence e ainda assim queremos continuar conversando.",
-"Você me ensinou que estar junto também é respeitar o tempo do outro.",
-"O cansaço e o silêncio também podem ser formas de cuidado.",
-"Te ver se divertir, se soltar e rir de você mesma me alegra e me faz rir junto.",
-"Quando você se abre e confia em mim nos seus piores momentos, eu fico de coração aberto.",
-"Não quero só os seus melhores dias, quero você inteira.",
-"Nos dias leves e nos difíceis.",
-"Se eu pudesse escolher, estaria ao seu lado para cuidar, acolher e dividir cada detalhe.",
-"Mesmo os detalhes mais simples.",
-"Neste Natal, agradeço por você existir na minha vida do jeito que é.",
-"Esse jeito não deve mudar, pois é por ele que sou apaixonado.",
-"Agradeço por me permitir sentir, criar confiança e aprender a crescer.",
-"O que sinto por você é tranquilo, forte e verdadeiro.",
-"É escolher estar, cuidar e seguir construindo, dia após dia.",
-"Quero que você se sinta amada, respeitada e segura.",
-"Quero ser carinho, verdade e um companheiro de coração aberto.",
-"Hoje e sempre.",
-
+  "Há algo em você que me acalma e me desarma ao mesmo tempo.",
+  "Algo que não pede explicação, apenas presença.",
+  "Nos seus gestos simples e nas mensagens do dia a dia, encontro um lugar seguro.",
+  "Quando penso em você, não penso em perfeição, penso em verdade.",
+  "Quero você inteira, nos dias leves e nos difíceis.",
+  "O que sinto por você é tranquilo, forte e verdadeiro."
 ];
 
 const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
@@ -213,62 +153,56 @@ const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 // ================= ELEMENTOS =================
 const mensagem = document.getElementById("mensagem");
 const contador = document.getElementById("contador");
+const debugInput = document.getElementById("debugInput");
 
 let revelando = false;
 let debugForcar = false;
 
-
-// ================= FUNÇÃO PRINCIPAL ATULIZAR =================
+// ================= CONTADOR =================
 function atualizar() {
   const agora = new Date();
 
-    if (debugForcar && !revelando) {
-    revelando = true;
-    mensagem.textContent = "";
-    digitarTexto();
+  if (debugForcar && !revelando) {
+    iniciarRevelacao();
     return;
   }
 
-  // SE A DATA CHEGOU → REVELA
   if (agora >= dataLiberacao) {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
-
-    if (!revelando) {
-      debugForcar = true;
-      mensagem.textContent = "";
-      digitarTexto();
-    }
+    if (!revelando) iniciarRevelacao();
     return;
   }
 
-  // ANTES DA DATA → MOSTRA TEXTO CIFRADO
   if (!revelando) {
-    mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
+    mensagem.innerHTML =
+      `<p class="hidden">${textoCifrado.join("<br><br>")}</p>`;
   }
 
-  // CONTADOR NORMAL
   const diff = dataLiberacao - agora;
-
-  const d = Math.floor(diff / 1000 / 60 / 60 / 24);
-  const h = Math.floor((diff / 1000 / 60 / 60) % 24);
-  const m = Math.floor((diff / 1000 / 60) % 60);
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff / 3600000) % 24);
+  const m = Math.floor((diff / 60000) % 60);
   const s = Math.floor((diff / 1000) % 60);
 
   contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
 }
 
-
-// ================= REVELAÇÃO =================
-const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
-
-function letraAleatoria() {
-  return caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-}
-
+// ================= DIGITAÇÃO =================
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
 let linhaAtual = 0;
 let charAtual = 0;
 let textoAtual = "";
 let decodificando = false;
+
+function iniciarRevelacao() {
+  revelando = true;
+  mensagem.innerHTML = "";
+  digitarTexto();
+}
+
+function letraAleatoria() {
+  return chars[Math.floor(Math.random() * chars.length)];
+}
 
 function digitarTexto() {
   if (linhaAtual < linhas.length) {
@@ -277,17 +211,12 @@ function digitarTexto() {
     if (charAtual < linha.length) {
       if (!decodificando) {
         decodificando = true;
-
         let tentativas = 0;
+
         const intervalo = setInterval(() => {
           tentativas++;
-
-          const textoFake =
-            textoAtual +
-            letraAleatoria();
-
           mensagem.innerHTML =
-            textoFake + '<span class="cursor">|</span>';
+            textoAtual + letraAleatoria() + '<span class="cursor">|</span>';
 
           if (tentativas > 4) {
             clearInterval(intervalo);
@@ -297,42 +226,41 @@ function digitarTexto() {
             digitarTexto();
           }
         }, 40);
-
       }
     } else {
       textoAtual += "\n\n";
-      mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
       linhaAtual++;
       charAtual = 0;
       setTimeout(digitarTexto, 600);
     }
-
   } else {
-    // Remove cursor
     mensagem.innerHTML = textoAtual;
 
-    // Assinatura com fade
     const sign = document.createElement("div");
     sign.className = "assinatura";
     sign.textContent = assinatura;
     mensagem.appendChild(sign);
 
-    setTimeout(() => {
-      sign.style.opacity = 1;
-    }, 800);
+    setTimeout(() => sign.style.opacity = 1, 800);
   }
 }
 
-
-
-setInterval(atualizar, 1000);
-atualizar();
+// ================= DEBUG =================
+debugInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    if (debugInput.value.trim().toLowerCase() === "flor de gyovana") {
+      debugForcar = true;
+      debugInput.placeholder = "✔ comando aceito";
+    }
+    debugInput.value = "";
+  }
+});
 
 // ================= NEVE =================
 function criarNeve() {
   const floco = document.createElement("div");
   floco.className = "snowflake";
-  floco.innerHTML = "❄";
+  floco.textContent = "❄";
   floco.style.left = Math.random() * window.innerWidth + "px";
   floco.style.animationDuration = (6 + Math.random() * 6) + "s";
   floco.style.fontSize = (10 + Math.random() * 18) + "px";
@@ -341,27 +269,9 @@ function criarNeve() {
 }
 
 setInterval(criarNeve, 350);
-
-  const debugInput = document.getElementById("debugInput");
-
-debugInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    if (debugInput.value.trim().toLowerCase() === "flor de gyovana") {
-      debugForcar = true;
-      debugInput.value = "";
-      debugInput.placeholder = "✔ comando aceito";
-    } else {
-      debugInput.value = "";
-    }
-  }
-});
-
-  
+setInterval(atualizar, 1000);
+atualizar();
 </script>
-  
-<div id="debugBox">
-  <input type="text" id="debugInput" placeholder="⌘ comando secreto">
-</div>
-  
+
 </body>
 </html>
