@@ -21,10 +21,9 @@ body {
   background: rgba(0,0,0,0.55);
   border-radius: 14px;
   box-shadow: 0 0 30px rgba(255,255,255,0.08);
-  text-align: center;
 }
 
-h1 { font-size: 1.6em; }
+h1 { text-align: center; font-size: 1.6em; }
 
 .contador {
   text-align: center;
@@ -33,21 +32,38 @@ h1 { font-size: 1.6em; }
   letter-spacing: 1px;
   color: #d7ede2;
 }
+  /* Botão flutuante e mensagem acima dele */
+#floatingButtonContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  text-align: center;
+  z-index: 1000;
+}
+
+#floatingMessage {
+  font-size: 0.9em;
+  color: #d7ede2;
+  margin-bottom: 6px;
+}
 
 #revealButton {
-  display: block;
-  margin: 20px auto;
-  padding: 12px 20px;
-  font-size: 1em;
-  border: none;
+  padding: 10px 16px;
   border-radius: 8px;
+  border: none;
   background: #d7ede2;
   color: #132f22;
   cursor: pointer;
+  font-size: 1em;
   transition: opacity 0.5s;
 }
 
 #revealButton:hover { background: #c4ded5; }
+
+/* Centralizar texto principal */
+#mensagem {
+  text-align: center;
+}
 
 .assinatura {
   text-align: right;
@@ -96,43 +112,25 @@ h1 { font-size: 1.6em; }
   outline: none;
   width: 160px;
 }
-
-/* Botão flutuante central */
-#floatingButtonContainer {
-  position: fixed;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 1000;
-}
-
-#floatingMessage {
-  font-size: 0.95em;
-  color: #d7ede2;
-  margin-bottom: 6px;
-  display: none;
-}
 </style>
 </head>
 
 <body>
+  
+  <!-- Botão flutuante -->
+<div id="floatingButtonContainer">
+  <div id="floatingMessage">✨ Ainda não está na hora ✨</div>
+  <button id="revealButton">Revelar Mensagem❓</button>
+</div>
 
 <div class="container">
   <h1>🎄 Algo especial está guardado aqui 🎁</h1>
   <div class="contador" id="contador"></div>
   <div id="mensagem"></div>
-  <button id="revealButton">🎵 Tocar música</button>
 </div>
 
 <div id="debugBox">
   <input type="text" id="debugInput" placeholder="⌘ comando secreto">
-</div>
-
-<!-- Botão flutuante -->
-<div id="floatingButtonContainer">
-  <div id="floatingMessage">✨ Ainda não está na hora ✨</div>
-  <button id="floatingButton">Clique aqui</button>
 </div>
 
 <audio id="audioBackground" loop></audio>
@@ -144,15 +142,69 @@ const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
 
 // ================= TEXTOS =================
 const textoCodificado = [
-  "por texto aqui",
-  "por texto aqui",
-  "por texto aqui"
+  "Jó fócz ra ykdf oco wd yfbmzje t qf hhvuzra zy mcsso ptyo.",
+"Czsks hqt qbt tchg vvtt eukpbcra, fqpfyo avtrdzmrr.",
+"Cqx yjcvz xrsgrg ztbgvxs, rmv jgbsz fvhbs bfe iqx et pzg, cs zkcfs fgqf izq ypgqk oc vkncs csgxv.",
+"Vxfrd lbgzy tbê wz dgsxk, fgz wt gpmpfe akpôqqc, fgz wt vzftff fnhbzdtzt.",
+"Jpwsr ts rpuo g fzycmu vyxkbwt tzgnwgg trr uqbvzm, rq dvmfrfc, rq mccyprz, rq sfytrdse vtsky.",
+"Dmsd jq tgbdm vbtfzhq jgcrqz cst hspt ds brgpx, rq hyyzt xqbb rglz gj vgrc.",
+"Rq thhzfg fzxx z ggszrfc tgx xrfcmf ts ftppq, cs gzoqr à etvxfêozz.",
+"Çvê rq jwv gqgq hv zrs wkqw lffy gvtgxtf y kf lszd ffyy xgsnvgg qhsyq bbrfyx.",
+"D zlb cs vksdb bfy p bb xzr gqvygvv z mtjcs.",
+"Sg vtfxzqs ph xgvqyyvr, xt rfrlt, rfd rq vpcê qgrz.",
+"Zvhq gkmz kvm rz zlrwx xrd q mvm rbl ptzq z gqj ty qzqy.",
+"T zzê dsdyl gr wfbivv mlf tpp hiy, rmts xt xppss yxxz btp hdhvsy wrn hcfkq zgzav.",
+"Jdkq zârz vrxt pq dvpxs z qk xr hswnfqfzw dvw jxxtvvx.",
+"Fqg rzct dmtxg x bts bts fypbhksl, xypdss wpzyrg sg vtgntgg hdbfyx.",
+"Vjfq sb wgdvtrb wv tzhvcyx bxs tvyynzr wgsx vkpzh fws zsvm tfdçvv bppfpz jtyjvqhz rq hskwm.",
+"Jtswb pprfdy.",
+"Qd zgzxz ztqz dzhx zy bzxw vyxlhhs, ztdfrg az xwspjbrf jgfr.",
+"Fqzjtyx avds, vmvbfv ksdz jskkbf b khffbf.",
+"Tnyzf x bfe ztkp, tyvqx vgmghf t bggvryx xgrz qk vgtczw.",
+"Cvrh fz qyppbb tv dtxzsz fzxx fvrkbh tbt hdfcttzv.",
+"Rzygr jfkz, sx fzdfe bvrfdg.",
+"Stpvv rfd rp wbg jgpc ptyo uqjv, whldg tgbx fqpfhs.",
+"Hfszgt qg qkzddr jgfrz, ngfr ggm czx ds kpbqpzz.",
+"Fhgz rz zssbgpdtf.",
+"Hsd zsnxzqz pqx aofê dzn lzzf z bgdcm kgg kgyv.",
+"Bb ztqzf gvdzhx, zxxc.",
+"Jx qxpjwbbf xrd gzdgm fvpdrs jgfrz.",
+"Jtswb zdkp qzjv fbgxtgyv tppfpz pgrz, gyljz t fzxxzqv.",
+"Xg zdgvt zshqz qk bts bts jgfrz.",
+"M hx wfpfxk zpwxr vchbg, fbgcszq ts tsr bfdj qthx.",
+"Hyqlcf tzsssfq z vvrhtf wrn bgdj zthzrg, ggm zs mxry zpsf.",
+"Zgkz Xksrz, zg tbgdvt fzhbgg gsp ztqz trgsxk zvr lzjh.",
+"Ksw jgfrz rzqv tdx tgpdrt pwg gk.",
+"Vdkz jgfrz bfe zs bzkdr gspg pqf gkdvftz, pzqrfkz, zfê gkdvftz.",
+"Jdkq zvr lzjh.",
 ];
 
 const linhas = [
-  "por texto aqui",
-  "por texto aqui",
-  "por texto aqui"
+"Há algo em você que me acalma e me desarma ao mesmo tempo.",
+"Algo que não pede explicação, apenas presença.",
+"Nos seus gestos simples e nas suas mensagens do dia a dia, encontro um lugar seguro.",
+"No jeito leve com que você entra na minha rotina, eu me sinto em casa.",
+"Quando penso em você, não penso em perfeição, penso nas suas falas verdadeiras.",
+"Gosto de como a nossa história acontece sem pressa, no cuidado e na atenção.",
+"Nas pequenas coisas do dia a dia, você me deixa chegar à sua vida.",
+"Nos risos fora de hora e nas noites cansadas que terminam em carinho, mesmo à distância.",
+"Até nos dias em que o sono vence e ainda assim queremos continuar conversando.",
+"Você me ensinou que estar junto também é respeitar o tempo do outro.",
+"O cansaço e o silêncio também podem ser formas de cuidado.",
+"Te ver se divertir, se soltar e rir de você mesma me alegra e me faz rir junto.",
+"Quando você se abre e confia em mim nos seus piores momentos, eu fico de coração aberto.",
+"Não quero só os seus melhores dias, quero você inteira.",
+"Nos dias leves e nos difíceis.",
+"Se eu pudesse escolher, estaria ao seu lado para cuidar, acolher e dividir cada detalhe.",
+"Mesmo os detalhes mais simples.",
+"Neste Natal, agradeço por você existir na minha vida do jeito que é.",
+"Esse jeito não deve mudar, pois é por ele que sou apaixonado.",
+"Agradeço por me permitir sentir, criar confiança e aprender a crescer.",
+"O que sinto por você é tranquilo, forte e verdadeiro.",
+"É escolher estar, cuidar e seguir construindo, dia após dia.",
+"Quero que você se sinta amada, respeitada e segura.",
+"Quero ser carinho, verdade e um companheiro de coração aberto.",
+"Hoje e sempre.",
 ];
 
 const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
@@ -163,10 +215,6 @@ const contador = document.getElementById("contador");
 const revealButton = document.getElementById("revealButton");
 const audioBackground = document.getElementById("audioBackground");
 const audioReveal = document.getElementById("audioReveal");
-
-const floatingButtonContainer = document.getElementById("floatingButtonContainer");
-const floatingMessage = document.getElementById("floatingMessage");
-const floatingButton = document.getElementById("floatingButton");
 
 let revelando = false;
 let debugAtivo = false;
@@ -184,7 +232,12 @@ function atualizar() {
     mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
   }
 
-  // Contador regressivo
+const floatingMessage = document.getElementById("floatingMessage");
+
+// Atualização do timer
+function atualizar() {
+  const agora = new Date();
+  
   if (agora < dataLiberacao) {
     const diff = dataLiberacao - agora;
     const d = Math.floor(diff / 1000 / 60 / 60 / 24);
@@ -192,13 +245,24 @@ function atualizar() {
     const m = Math.floor((diff / 1000 / 60) % 60);
     const s = Math.floor((diff / 1000) % 60);
     contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
-    floatingButtonContainer.style.display = "block";
+    
+    // Mostrar botão e mensagem
+    floatingMessage.style.display = "block";
+    revealButton.style.display = "inline-block";
+
   } else {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
-    floatingButtonContainer.style.display = "none";
-    if (!revelando) iniciarRevelacao();
+    
+    // Ocultar botão e mensagem
+    floatingMessage.style.display = "none";
+    revealButton.style.display = "none";
+    
+    if (!revelando && localStorage.getItem(storageKey)!=="true") {
+      iniciarRevelacao();
+    }
   }
 }
+
 
 // ================= REVELAÇÃO =================
 const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
@@ -279,26 +343,14 @@ document.getElementById("debugInput").addEventListener("keydown",(e)=>{
       mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
       audioReveal.pause();
       audioReveal.currentTime = 0;
-    },5000);
+    },120000); //2 min
     e.target.value="";
     e.target.placeholder="✔ comando aceito";
   }
 });
 
-// ================= BOTÕES =================
-// Botão original de tocar música
+// ================= BOTÃO =================
 revealButton.addEventListener("click",()=>{ audioBackground.play().catch(()=>{}); });
-
-// Botão flutuante temporário
-let clicouUmaVez = sessionStorage.getItem("clicouUmaVez");
-floatingButton.addEventListener("click", ()=>{
-  if(!clicouUmaVez){
-    floatingMessage.style.display="block";
-    setTimeout(()=>{ floatingMessage.style.display="none"; }, 5000);
-    sessionStorage.setItem("clicouUmaVez","true");
-    clicouUmaVez = true;
-  }
-});
 
 // ================= INICIAL =================
 setInterval(atualizar,1000);
