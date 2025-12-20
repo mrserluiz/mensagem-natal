@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>🎄 Uma Mensagem de Natal</title>
+
+<style>
+body {
+  background: radial-gradient(circle, #0b1d12, #020b05);
+  color: #f1f8f4;
+  font-family: 'Georgia', serif;
+  padding: 40px;
+}
+h1 {
+  text-align: center;
+}
+.hidden {
+  opacity: 0.15;
+}
+.revealed {
+  opacity: 1;
+  transition: opacity 1s;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎄 Uma mensagem está esperando por você</h1>
+<p id="mensagem"></p>
+
+<script>
+const texto = `Há algo em você que me acalma e me desarma ao mesmo tempo. Algo que não pede explicação, apenas presença. Nos seus gestos simples, nas suas mensagens do dia a dia, no jeito leve com que você entra na minha rotina, eu encontro um lugar seguro. Quando penso em você, não penso em perfeição, penso em suas falas verdadeiras. Gosto de como a nossa história acontece sem pressa, no cuidado, na atenção, nas pequenas coisas, como me deixa chegar na sua vida nos pequenos atos do nosso dia a dia, nos risos fora de hora, nas noites cansadas que terminam em carinho, mesmo à distância. Até nos dias em que o sono vence e continuamos querendo conversar.
+
+Você me ensinou que estar junto também é respeitar o tempo do outro, o cansaço, o silêncio, podem ser também cuidado. Te ver se divertir, se soltar, rir de você mesma, tudo isso me alegra e me faz rir junto com você, e até quando se abre e me dá confiança dos seus piores momentos fico com o coração aberto porque eu não quero só os seus melhores momentos, quero você inteira. Nos dias leves e nos difíceis.
+
+E se eu pudesse escolher, estaria ao seu lado para cuidar, acolher e dividir cada detalhe, mesmo os mais simples. Neste Natal, eu agradeço por você existir na minha vida do jeito que é, este jeito não deve mudar pois é por ele que sou apaixonado e quero ficar ao seu lado, agradeço por me permitir sentir, criar confiança e fazer eu aprender a crescer, tirar meus medos. O que sinto por você é tranquilo, forte e verdadeiro. É escolher estar, de cuidar e de seguir construindo, cada dia mais. Quero que você se sinta amada, respeitada e segura, carinho, verdade, um companheiro que possa contar de verdade com o coração aberto para você, hoje e sempre.
+
+Do seu Tabacudo de São Paulo,
+S. Luiz`;
+
+const palavras = texto.split(" ");
+const hoje = new Date();
+const dia = hoje.getDate();
+
+let qtd;
+if (dia >= 25) qtd = palavras.length;
+else if (dia === 24) qtd = Math.floor(palavras.length * 0.4);
+else qtd = 0;
+
+let indices = [...palavras.keys()];
+indices.sort(() => Math.random() - 0.5);
+
+let revelar = indices.slice(0, qtd);
+
+document.getElementById("mensagem").innerHTML =
+  palavras.map((p,i) =>
+    revelar.includes(i)
+      ? `<span class="revealed">${p}</span>`
+      : `<span class="hidden">${p}</span>`
+  ).join(" ");
+</script>
+
+</body>
+</html>
