@@ -76,6 +76,7 @@ h1 { text-align: center; font-size: 1.6em; }
   .container { margin: 20px; padding: 22px; }
 }
 
+/* Caixa discreta de debug */
 #debugBox {
   position: fixed;
   bottom: 12px;
@@ -100,7 +101,7 @@ h1 { text-align: center; font-size: 1.6em; }
 <body>
 
 <div class="container">
-  <h1>🎄 Algo especial está guardado aqui 🎁 </h1>
+  <h1>🎄 Algo especial está guardado aqui 🎁</h1>
   <div class="contador" id="contador"></div>
   <div id="mensagem"></div>
   <button id="revealButton">🎵 Tocar música</button>
@@ -114,17 +115,17 @@ h1 { text-align: center; font-size: 1.6em; }
 <audio id="audioReveal"></audio>
 
 <script>
+// ================= CONFIGURAÇÃO =================
 const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
 const storageKey = "mensagemRevelada";
 
-// 01 - Texto codificado (visível antes da data)
+// ================= TEXTOS =================
+// Texto codificado (sempre visível antes da data)
 const textoCodificado = [
-  "textoCodificado",
-  "textoCodificado",
-  "textoCodificado"
+ "textoCodificado"
 ];
 
-// 02 - Texto de revelação (com efeitos)
+// Texto real/revelação (apenas na data ou debug)
 const linhas = [
   "por texto aqui",
   "por texto aqui",
@@ -133,6 +134,7 @@ const linhas = [
 
 const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 
+// ================= ELEMENTOS =================
 const mensagem = document.getElementById("mensagem");
 const contador = document.getElementById("contador");
 const revealButton = document.getElementById("revealButton");
@@ -142,6 +144,7 @@ const audioReveal = document.getElementById("audioReveal");
 let revelando = false;
 let debugAtivo = false;
 
+// ================= AUDIO =================
 audioBackground.src = "background.mp3";
 audioReveal.src = "reveal.mp3";
 
@@ -149,8 +152,8 @@ audioReveal.src = "reveal.mp3";
 function atualizar() {
   const agora = new Date();
 
+  // Mostrar texto codificado sempre antes da data (sem digitação)
   if (!revelando && !debugAtivo) {
-    // Mostrar texto codificado antes da data
     mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
   }
 
@@ -164,6 +167,7 @@ function atualizar() {
     contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
   } else {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
+    // Iniciar revelação real só na data e se não foi revelada
     if (!revelando && localStorage.getItem(storageKey)!=="true") {
       iniciarRevelacao();
     }
@@ -174,7 +178,7 @@ function atualizar() {
 const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
 function letraAleatoria() { return caracteres.charAt(Math.floor(Math.random() * caracteres.length)); }
 
-let linhaAtual=0, charAtual=0, textoAtual="", decodificando=false;
+let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
 
 function iniciarRevelacao() {
   if (revelando) return;
@@ -183,7 +187,10 @@ function iniciarRevelacao() {
   mensagem.textContent = "";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
-  linhaAtual=0; charAtual=0; textoAtual=""; decodificando=false;
+  linhaAtual = 0;
+  charAtual = 0;
+  textoAtual = "";
+  decodificando = false;
   digitarTexto();
 }
 
@@ -193,8 +200,8 @@ function digitarTexto() {
     if (charAtual < linha.length) {
       if (!decodificando) {
         decodificando = true;
-        let tentativas=0;
-        const intervalo=setInterval(()=>{
+        let tentativas = 0;
+        const intervalo = setInterval(()=>{
           tentativas++;
           mensagem.innerHTML = textoAtual + letraAleatoria() + '<span class="cursor">|</span>';
           if(tentativas>2){
@@ -204,20 +211,20 @@ function digitarTexto() {
             decodificando=false;
             digitarTexto();
           }
-        },25);
+        },25); // digitação rápida
       }
     } else {
       textoAtual += "\n\n";
       mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
       linhaAtual++;
-      charAtual=0;
+      charAtual = 0;
       setTimeout(digitarTexto,300);
     }
   } else {
     mensagem.innerHTML = textoAtual;
-    const sign=document.createElement("div");
-    sign.className="assinatura";
-    sign.textContent=assinatura;
+    const sign = document.createElement("div");
+    sign.className = "assinatura";
+    sign.textContent = assinatura;
     mensagem.appendChild(sign);
     setTimeout(()=>{sign.style.opacity=1},800);
   }
@@ -225,9 +232,9 @@ function digitarTexto() {
 
 // ================= NEVE =================
 function criarNeve() {
-  const floco=document.createElement("div");
-  floco.className="snowflake";
-  floco.innerHTML="❄";
+  const floco = document.createElement("div");
+  floco.className = "snowflake";
+  floco.innerHTML = "❄";
   floco.style.left = Math.random()*window.innerWidth + "px";
   floco.style.animationDuration = (6+Math.random()*6)+"s";
   floco.style.fontSize = (10+Math.random()*18)+"px";
@@ -260,6 +267,7 @@ revealButton.addEventListener("click",()=>{ audioBackground.play().catch(()=>{})
 setInterval(atualizar,1000);
 atualizar();
 
+// Caso já tenha sido revelada oficialmente
 if(localStorage.getItem(storageKey)==="true"){
   iniciarRevelacao();
 }
