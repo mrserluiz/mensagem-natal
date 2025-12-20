@@ -117,15 +117,14 @@ h1 { text-align: center; font-size: 1.6em; }
 <script>
 // ================= CONFIGURAÇÃO =================
 const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
-const storageKey = "mensagemRevelada";
 
 // ================= TEXTOS =================
-// Texto codificado (sempre visível antes da data)
 const textoCodificado = [
- "textoCodificado"
+  "por texto aqui",
+  "por texto aqui",
+  "por texto aqui"
 ];
 
-// Texto real/revelação (apenas na data ou debug)
 const linhas = [
   "por texto aqui",
   "por texto aqui",
@@ -152,7 +151,7 @@ audioReveal.src = "reveal.mp3";
 function atualizar() {
   const agora = new Date();
 
-  // Mostrar texto codificado sempre antes da data (sem digitação)
+  // Texto codificado sempre visível antes da data (sem digitação)
   if (!revelando && !debugAtivo) {
     mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
   }
@@ -167,10 +166,7 @@ function atualizar() {
     contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
   } else {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
-    // Iniciar revelação real só na data e se não foi revelada
-    if (!revelando && localStorage.getItem(storageKey)!=="true") {
-      iniciarRevelacao();
-    }
+    if (!revelando) iniciarRevelacao();
   }
 }
 
@@ -183,7 +179,6 @@ let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
 function iniciarRevelacao() {
   if (revelando) return;
   revelando = true;
-  localStorage.setItem(storageKey,"true");
   mensagem.textContent = "";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
@@ -211,7 +206,7 @@ function digitarTexto() {
             decodificando=false;
             digitarTexto();
           }
-        },25); // digitação rápida
+        },25);
       }
     } else {
       textoAtual += "\n\n";
@@ -246,14 +241,14 @@ setInterval(criarNeve,350);
 // ================= DEBUG =================
 document.getElementById("debugInput").addEventListener("keydown",(e)=>{
   if(e.key==="Enter" && e.target.value.trim().toLowerCase()==="flor de gyovana"){
-    debugAtivo=true;
+    debugAtivo = true;
     audioReveal.play().catch(()=>{});
     mensagem.innerHTML = linhas.join("<br>");
     setTimeout(()=>{
-      debugAtivo=false;
+      debugAtivo = false;
       mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
       audioReveal.pause();
-      audioReveal.currentTime=0;
+      audioReveal.currentTime = 0;
     },5000);
     e.target.value="";
     e.target.placeholder="✔ comando aceito";
@@ -266,11 +261,6 @@ revealButton.addEventListener("click",()=>{ audioBackground.play().catch(()=>{})
 // ================= INICIAL =================
 setInterval(atualizar,1000);
 atualizar();
-
-// Caso já tenha sido revelada oficialmente
-if(localStorage.getItem(storageKey)==="true"){
-  iniciarRevelacao();
-}
 </script>
 
 </body>
