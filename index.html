@@ -32,21 +32,38 @@ h1 { text-align: center; font-size: 1.6em; }
   letter-spacing: 1px;
   color: #d7ede2;
 }
+  /* Botão flutuante e mensagem acima dele */
+#floatingButtonContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  text-align: center;
+  z-index: 1000;
+}
+
+#floatingMessage {
+  font-size: 0.9em;
+  color: #d7ede2;
+  margin-bottom: 6px;
+}
 
 #revealButton {
-  display: block;
-  margin: 20px auto;
-  padding: 12px 20px;
-  font-size: 1em;
-  border: none;
+  padding: 10px 16px;
   border-radius: 8px;
+  border: none;
   background: #d7ede2;
   color: #132f22;
   cursor: pointer;
+  font-size: 1em;
   transition: opacity 0.5s;
 }
 
 #revealButton:hover { background: #c4ded5; }
+
+/* Centralizar texto principal */
+#mensagem {
+  text-align: center;
+}
 
 .assinatura {
   text-align: right;
@@ -99,12 +116,17 @@ h1 { text-align: center; font-size: 1.6em; }
 </head>
 
 <body>
+  
+  <!-- Botão flutuante -->
+<div id="floatingButtonContainer">
+  <div id="floatingMessage">✨ Ainda não está na hora ✨</div>
+  <button id="revealButton">Revelar Mensagem❓</button>
+</div>
 
 <div class="container">
   <h1>🎄 Algo especial está guardado aqui 🎁</h1>
   <div class="contador" id="contador"></div>
   <div id="mensagem"></div>
-  <button id="revealButton">Revelar Mensagem ❓</button>
 </div>
 
 <div id="debugBox">
@@ -210,7 +232,12 @@ function atualizar() {
     mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
   }
 
-  // Contador regressivo
+const floatingMessage = document.getElementById("floatingMessage");
+
+// Atualização do timer
+function atualizar() {
+  const agora = new Date();
+  
   if (agora < dataLiberacao) {
     const diff = dataLiberacao - agora;
     const d = Math.floor(diff / 1000 / 60 / 60 / 24);
@@ -218,11 +245,24 @@ function atualizar() {
     const m = Math.floor((diff / 1000 / 60) % 60);
     const s = Math.floor((diff / 1000) % 60);
     contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
+    
+    // Mostrar botão e mensagem
+    floatingMessage.style.display = "block";
+    revealButton.style.display = "inline-block";
+
   } else {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
-    if (!revelando) iniciarRevelacao();
+    
+    // Ocultar botão e mensagem
+    floatingMessage.style.display = "none";
+    revealButton.style.display = "none";
+    
+    if (!revelando && localStorage.getItem(storageKey)!=="true") {
+      iniciarRevelacao();
+    }
   }
 }
+
 
 // ================= REVELAÇÃO =================
 const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
