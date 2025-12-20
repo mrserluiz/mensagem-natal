@@ -36,20 +36,20 @@ h1 {
   color: #d7ede2;
 }
 
-p {
-  line-height: 1.8;
-  font-size: 1.05em;
-  margin-bottom: 18px;
+#revealButton {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 8px;
+  background: #d7ede2;
+  color: #132f22;
+  cursor: pointer;
+  transition: opacity 0.5s;
 }
 
-.hidden {
-  opacity: 0.15;
-}
-
-.linha {
-  opacity: 0;
-  animation: fadeIn 2.5s forwards;
-}
+#revealButton:hover { background: #c4ded5; }
 
 .assinatura {
   text-align: right;
@@ -74,9 +74,7 @@ p {
   z-index: 999;
 }
 
-#debugBox:hover {
-  opacity: 1;
-}
+#debugBox:hover { opacity: 1; }
 
 #debugInput {
   background: rgba(0,0,0,0.6);
@@ -89,38 +87,7 @@ p {
   width: 160px;
 }
 
-@keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* NEVE */
-.snowflake {
-  position: fixed;
-  top: -10px;
-  color: white;
-  opacity: 0.7;
-  pointer-events: none;
-  animation: fall linear infinite;
-}
-
-@keyframes fall {
-  to { transform: translateY(110vh); }
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-  .container {
-    margin: 20px;
-    padding: 22px;
-  }
-}
+@keyframes blink { 0%{opacity:1}50%{opacity:0}100%{opacity:1} }
 </style>
 </head>
 
@@ -130,6 +97,7 @@ p {
   <h1>🎄 Algo especial está guardado aqui 🎁 </h1>
   <div class="contador" id="contador"></div>
   <div id="mensagem"></div>
+  <button id="revealButton">🎁 Revelar Mensagem</button>
 </div>
 
 <!-- Debug -->
@@ -147,8 +115,9 @@ const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
 const storageKey = "mensagemRevelada";
 
 // ================= TEXTOS =================
-const textoCifrado = [
-"Jó fócz ra ykdf oco wd yfbmzje t qf hhvuzra zy mcsso ptyo.",
+const textoCifrado =
+  [
+  "Jó fócz ra ykdf oco wd yfbmzje t qf hhvuzra zy mcsso ptyo.",
 "Czsks hqt qbt tchg vvtt eukpbcra, fqpfyo avtrdzmrr.",
 "Cqx yjcvz xrsgrg ztbgvxs, rmv jgbsz fvhbs bfe iqx et pzg, cs zkcfs fgqf izq ypgqk oc vkncs csgxv.",
 "Vxfrd lbgzy tbê wz dgsxk, fgz wt gpmpfe akpôqqc, fgz wt vzftff fnhbzdtzt.",
@@ -183,7 +152,7 @@ const textoCifrado = [
 "Ksw jgfrz rzqv tdx tgpdrt pwg gk.",
 "Vdkz jgfrz bfe zs bzkdr gspg pqf gkdvftz, pzqrfkz, zfê gkdvftz.",
 "Jdkq zvr lzjh.",
-];
+  ];
 
 const linhas = [
 "Há algo em você que me acalma e me desarma ao mesmo tempo.",
@@ -218,6 +187,7 @@ const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 // ================= ELEMENTOS =================
 const mensagem = document.getElementById("mensagem");
 const contador = document.getElementById("contador");
+const revealButton = document.getElementById("revealButton");
 const audioBackground = document.getElementById("audioBackground");
 const audioReveal = document.getElementById("audioReveal");
 
@@ -228,17 +198,12 @@ let debugForcar = false;
 audioBackground.src = "background.mp3";
 audioReveal.src = "reveal.mp3";
 
-// Toca música de fundo antes da revelação
-audioBackground.play().catch(()=>{});
-
 // ================= FUNÇÃO PRINCIPAL =================
 function atualizar() {
   const agora = new Date();
 
-  if (debugForcar && !revelando) {
-    iniciarRevelacao();
-    return;
-  }
+  // Debug
+  if (debugForcar && !revelando) { iniciarRevelacao(); return; }
 
   if (agora >= dataLiberacao) {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
@@ -246,9 +211,7 @@ function atualizar() {
     return;
   }
 
-  if (!revelando) {
-    mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
-  }
+  if (!revelando) { mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`; }
 
   const diff = dataLiberacao - agora;
   const d = Math.floor(diff / 1000 / 60 / 60 / 24);
@@ -260,88 +223,92 @@ function atualizar() {
 
 // ================= REVELAÇÃO =================
 const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
-function letraAleatoria() {
-  return caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-}
+function letraAleatoria(){ return caracteres.charAt(Math.floor(Math.random()*caracteres.length)); }
 
-let linhaAtual = 0;
-let charAtual = 0;
-let textoAtual = "";
-let decodificando = false;
+let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
 
 function iniciarRevelacao() {
+  if(revelando) return;
   revelando = true;
-  localStorage.setItem(storageKey, "true");
-  mensagem.textContent = "";
+  localStorage.setItem(storageKey,"true");
+  mensagem.textContent="";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
-  linhaAtual = 0;
-  charAtual = 0;
-  textoAtual = "";
-  decodificando = false;
+  revealButton.style.opacity = 0;
+  setTimeout(()=>{ revealButton.style.display="none"; },500);
+  linhaAtual = 0; charAtual = 0; textoAtual = ""; decodificando=false;
   digitarTexto();
 }
 
 function digitarTexto() {
-  if (linhaAtual < linhas.length) {
+  if(linhaAtual < linhas.length){
     const linha = linhas[linhaAtual];
-    if (charAtual < linha.length) {
-      if (!decodificando) {
-        decodificando = true;
-        let tentativas = 0;
-        const intervalo = setInterval(() => {
+    if(charAtual < linha.length){
+      if(!decodificando){
+        decodificando=true;
+        let tentativas=0;
+        const intervalo = setInterval(()=>{
           tentativas++;
           const textoFake = textoAtual + letraAleatoria();
           mensagem.innerHTML = textoFake + '<span class="cursor">|</span>';
-          if (tentativas > 4) {
+          if(tentativas>4){
             clearInterval(intervalo);
             textoAtual += linha.charAt(charAtual);
             charAtual++;
-            decodificando = false;
+            decodificando=false;
             digitarTexto();
           }
-        }, 40);
+        },40);
       }
     } else {
       textoAtual += "\n\n";
       mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
       linhaAtual++;
-      charAtual = 0;
-      setTimeout(digitarTexto, 600);
+      charAtual=0;
+      setTimeout(digitarTexto,600);
     }
   } else {
-    mensagem.innerHTML = textoAtual;
-    const sign = document.createElement("div");
-    sign.className = "assinatura";
-    sign.textContent = assinatura;
+    mensagem.innerHTML=textoAtual;
+    const sign=document.createElement("div");
+    sign.className="assinatura";
+    sign.textContent=assinatura;
     mensagem.appendChild(sign);
-    setTimeout(()=>{ sign.style.opacity = 1; }, 800);
+    setTimeout(()=>{ sign.style.opacity=1; },800);
   }
 }
 
 // ================= NEVE =================
-function criarNeve() {
-  const floco = document.createElement("div");
-  floco.className = "snowflake";
-  floco.innerHTML = "❄";
-  floco.style.left = Math.random() * window.innerWidth + "px";
-  floco.style.animationDuration = (6 + Math.random() * 6) + "s";
-  floco.style.fontSize = (10 + Math.random() * 18) + "px";
+function criarNeve(){
+  const floco=document.createElement("div");
+  floco.className="snowflake";
+  floco.innerHTML="❄";
+  floco.style.left=Math.random()*window.innerWidth+"px";
+  floco.style.animationDuration=(6+Math.random()*6)+"s";
+  floco.style.fontSize=(10+Math.random()*18)+"px";
   document.body.appendChild(floco);
-  setTimeout(()=> floco.remove(), 12000);
+  setTimeout(()=>floco.remove(),12000);
 }
-setInterval(criarNeve, 350);
+setInterval(criarNeve,350);
 
 // ================= DEBUG =================
-const debugInput = document.getElementById("debugInput");
-debugInput.addEventListener("keydown", (e)=>{
-  if(e.key === "Enter"){
+const debugInput=document.getElementById("debugInput");
+debugInput.addEventListener("keydown",(e)=>{
+  if(e.key==="Enter"){
     if(debugInput.value.trim().toLowerCase()==="flor de gyovana"){
-      debugForcar = true;
+      debugForcar=true;
       debugInput.value="";
       debugInput.placeholder="✔ comando aceito";
       atualizar();
     } else debugInput.value="";
+  }
+});
+
+// ================= BOTÃO REVELAR =================
+revealButton.addEventListener("click", ()=>{
+  audioBackground.play().catch(()=>{});
+  const agora = new Date();
+  if(agora >= dataLiberacao || debugForcar){
+    iniciarRevelacao();
   }
 });
 
@@ -352,12 +319,6 @@ if(localStorage.getItem(storageKey)==="true"){
   setInterval(atualizar,1000);
   atualizar();
 }
-
-// ================= AUTOPLAY AUDIO =================
-document.body.addEventListener('click', ()=>{
-  audioBackground.play().catch(()=>{});
-  audioReveal.play().catch(()=>{});
-});
 </script>
 
 </body>
