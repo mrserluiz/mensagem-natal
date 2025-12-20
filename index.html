@@ -34,8 +34,23 @@ h1 { font-size: 1.6em; }
   color: #d7ede2;
 }
 
+#revealButton {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 8px;
+  background: #d7ede2;
+  color: #132f22;
+  cursor: pointer;
+  transition: opacity 0.5s;
+}
+
+#revealButton:hover { background: #c4ded5; }
+
 .assinatura {
-  text-align: center;
+  text-align: right;
   margin-top: 40px;
   font-style: italic;
   opacity: 0;
@@ -58,9 +73,34 @@ h1 { font-size: 1.6em; }
 @keyframes blink { 0%{opacity:1}50%{opacity:0}100%{opacity:1} }
 @keyframes fall { to { transform: translateY(110vh); } }
 
+@media (max-width: 600px){
+  .container { margin: 20px; padding: 22px; }
+}
+
+/* Caixa discreta de debug */
+#debugBox {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  opacity: 0.15;
+  z-index: 999;
+}
+
+#debugInput {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 0.8em;
+  border-radius: 6px;
+  outline: none;
+  width: 160px;
+}
+
+/* Botão flutuante central */
 #floatingButtonContainer {
   position: fixed;
-  top: 40%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -73,70 +113,78 @@ h1 { font-size: 1.6em; }
   margin-bottom: 6px;
   display: none;
 }
-
-#revealButton {
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #d7ede2;
-  color: #132f22;
-  cursor: pointer;
-  font-size: 1em;
-  transition: opacity 0.5s;
-}
-
-#revealButton:hover { background: #c4ded5; }
 </style>
 </head>
+
 <body>
 
 <div class="container">
-  <h1>🎄 Algo especial está guardado aqui 🎁 </h1>
+  <h1>🎄 Algo especial está guardado aqui 🎁</h1>
   <div class="contador" id="contador"></div>
   <div id="mensagem"></div>
+  <button id="revealButton">🎵 Tocar música</button>
+</div>
+
+<div id="debugBox">
+  <input type="text" id="debugInput" placeholder="⌘ comando secreto">
 </div>
 
 <!-- Botão flutuante -->
 <div id="floatingButtonContainer">
   <div id="floatingMessage">✨ Ainda não está na hora ✨</div>
-  <button id="revealButton">Clique aqui</button>
+  <button id="floatingButton">Clique aqui</button>
 </div>
 
 <audio id="audioBackground" loop></audio>
 <audio id="audioReveal"></audio>
 
 <script>
-const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0);
-const storageKey = "mensagemRevelada";
+// ================= CONFIGURAÇÃO =================
+const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
+
+// ================= TEXTOS =================
+const textoCodificado = [
+  "por texto aqui",
+  "por texto aqui",
+  "por texto aqui"
+];
 
 const linhas = [
   "por texto aqui",
   "por texto aqui",
   "por texto aqui"
 ];
+
 const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 
+// ================= ELEMENTOS =================
 const mensagem = document.getElementById("mensagem");
 const contador = document.getElementById("contador");
-const floatingButtonContainer = document.getElementById("floatingButtonContainer");
-const floatingMessage = document.getElementById("floatingMessage");
 const revealButton = document.getElementById("revealButton");
 const audioBackground = document.getElementById("audioBackground");
 const audioReveal = document.getElementById("audioReveal");
 
-let revelando = false;
+const floatingButtonContainer = document.getElementById("floatingButtonContainer");
+const floatingMessage = document.getElementById("floatingMessage");
+const floatingButton = document.getElementById("floatingButton");
 
-// Texto codificado sempre visível
-function mostrarCodificado() {
-  mensagem.innerHTML = linhas.map(l => `<p class="hidden">${l}</p>`).join('');
-}
+let revelando = false;
+let debugAtivo = false;
+
+// ================= AUDIO =================
+audioBackground.src = "background.mp3";
+audioReveal.src = "reveal.mp3";
 
 // ================= FUNÇÃO ATUALIZAR =================
 function atualizar() {
   const agora = new Date();
 
-  if (!revelando) mostrarCodificado();
+  // Texto codificado sempre visível antes da data (sem digitação)
+  if (!revelando && !debugAtivo) {
+    mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
+  }
 
+  // Contador regressivo
   if (agora < dataLiberacao) {
     const diff = dataLiberacao - agora;
     const d = Math.floor(diff / 1000 / 60 / 60 / 24);
@@ -148,24 +196,26 @@ function atualizar() {
   } else {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
     floatingButtonContainer.style.display = "none";
-    if (!revelando && localStorage.getItem(storageKey)!=="true") iniciarRevelacao();
+    if (!revelando) iniciarRevelacao();
   }
 }
 
 // ================= REVELAÇÃO =================
 const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
-function letraAleatoria(){ return caracteres.charAt(Math.floor(Math.random()*caracteres.length)); }
+function letraAleatoria() { return caracteres.charAt(Math.floor(Math.random() * caracteres.length)); }
 
-let linhaAtual=0, charAtual=0, textoAtual="", decodificando=false;
+let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
 
 function iniciarRevelacao() {
   if (revelando) return;
   revelando = true;
-  localStorage.setItem(storageKey,"true");
   mensagem.textContent = "";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
-  linhaAtual=0; charAtual=0; textoAtual=""; decodificando=false;
+  linhaAtual = 0;
+  charAtual = 0;
+  textoAtual = "";
+  decodificando = false;
   digitarTexto();
 }
 
@@ -175,7 +225,7 @@ function digitarTexto() {
     if (charAtual < linha.length) {
       if (!decodificando) {
         decodificando = true;
-        let tentativas=0;
+        let tentativas = 0;
         const intervalo = setInterval(()=>{
           tentativas++;
           mensagem.innerHTML = textoAtual + letraAleatoria() + '<span class="cursor">|</span>';
@@ -192,14 +242,14 @@ function digitarTexto() {
       textoAtual += "\n\n";
       mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
       linhaAtual++;
-      charAtual=0;
+      charAtual = 0;
       setTimeout(digitarTexto,300);
     }
   } else {
     mensagem.innerHTML = textoAtual;
-    const sign=document.createElement("div");
-    sign.className="assinatura";
-    sign.textContent=assinatura;
+    const sign = document.createElement("div");
+    sign.className = "assinatura";
+    sign.textContent = assinatura;
     mensagem.appendChild(sign);
     setTimeout(()=>{sign.style.opacity=1},800);
   }
@@ -207,21 +257,41 @@ function digitarTexto() {
 
 // ================= NEVE =================
 function criarNeve() {
-  const floco=document.createElement("div");
-  floco.className="snowflake";
-  floco.innerHTML="❄";
-  floco.style.left=Math.random()*window.innerWidth+"px";
-  floco.style.animationDuration=(6+Math.random()*6)+"s";
-  floco.style.fontSize=(10+Math.random()*18)+"px";
+  const floco = document.createElement("div");
+  floco.className = "snowflake";
+  floco.innerHTML = "❄";
+  floco.style.left = Math.random()*window.innerWidth + "px";
+  floco.style.animationDuration = (6+Math.random()*6)+"s";
+  floco.style.fontSize = (10+Math.random()*18)+"px";
   document.body.appendChild(floco);
   setTimeout(()=>floco.remove(),12000);
 }
 setInterval(criarNeve,350);
 
-// ================= BOTÃO FLUTUANTE =================
-let clicouUmaVez = sessionStorage.getItem("clicouUmaVez");
+// ================= DEBUG =================
+document.getElementById("debugInput").addEventListener("keydown",(e)=>{
+  if(e.key==="Enter" && e.target.value.trim().toLowerCase()==="flor de gyovana"){
+    debugAtivo = true;
+    audioReveal.play().catch(()=>{});
+    mensagem.innerHTML = linhas.join("<br>");
+    setTimeout(()=>{
+      debugAtivo = false;
+      mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
+      audioReveal.pause();
+      audioReveal.currentTime = 0;
+    },5000);
+    e.target.value="";
+    e.target.placeholder="✔ comando aceito";
+  }
+});
 
-revealButton.addEventListener("click",()=>{
+// ================= BOTÕES =================
+// Botão original de tocar música
+revealButton.addEventListener("click",()=>{ audioBackground.play().catch(()=>{}); });
+
+// Botão flutuante temporário
+let clicouUmaVez = sessionStorage.getItem("clicouUmaVez");
+floatingButton.addEventListener("click", ()=>{
   if(!clicouUmaVez){
     floatingMessage.style.display="block";
     setTimeout(()=>{ floatingMessage.style.display="none"; }, 5000);
@@ -230,14 +300,9 @@ revealButton.addEventListener("click",()=>{
   }
 });
 
-// ================= AUDIO =================
-revealButton.addEventListener("dblclick",()=>{ audioBackground.play().catch(()=>{}); }); // opcional: duplo click inicia áudio
-
 // ================= INICIAL =================
 setInterval(atualizar,1000);
 atualizar();
-
-if(localStorage.getItem(storageKey)==="true") iniciarRevelacao();
 </script>
 
 </body>
