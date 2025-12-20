@@ -45,6 +45,7 @@ h1 { text-align: center; font-size: 1.6em; }
   cursor: pointer;
   transition: opacity 0.5s;
 }
+
 #revealButton:hover { background: #c4ded5; }
 
 .assinatura {
@@ -56,7 +57,6 @@ h1 { text-align: center; font-size: 1.6em; }
 }
 
 .cursor { display: inline-block; margin-left: 2px; animation: blink 1s infinite; }
-
 .hidden { opacity: 0.15; }
 
 .snowflake {
@@ -73,10 +73,11 @@ h1 { text-align: center; font-size: 1.6em; }
   bottom: 12px;
   left: 12px;
   opacity: 0.15;
-  transition: opacity 0.3s ease;
-  z-index: 999;
+  background: black;
+  padding: 6px;
+  border-radius: 6px;
 }
-#debugBox:hover { opacity: 1; }
+
 #debugInput {
   background: rgba(0,0,0,0.6);
   border: 1px solid rgba(255,255,255,0.2);
@@ -106,12 +107,12 @@ h1 { text-align: center; font-size: 1.6em; }
   <button id="revealButton">🎁 Revelar Mensagem</button>
 </div>
 
-<!-- Debug discreto -->
+<!-- Debug -->
 <div id="debugBox">
   <input type="text" id="debugInput" placeholder="⌘ comando secreto">
 </div>
 
-<!-- Áudio -->
+<!-- Audio -->
 <audio id="audioBackground" loop></audio>
 <audio id="audioReveal"></audio>
 
@@ -121,9 +122,11 @@ const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
 const storageKey = "mensagemRevelada";
 
 // ================= TEXTOS =================
-const textoCifrado = `"por texto codificado aqui..."`;
+const textoCifrado = `"aqui texto codificado aqui..."`;
 const linhas = [
-"por texto aqui","por texto aqui","por texto aqui"
+  "por texto aqui",
+  "por texto aqui",
+  "por texto aqui"
 ];
 const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 
@@ -135,92 +138,93 @@ const audioBackground = document.getElementById("audioBackground");
 const audioReveal = document.getElementById("audioReveal");
 
 let revelando = false;
-let debugForcar = false;
+let debugForcar = false; // temporário, não altera localStorage
 
 // ================= AUDIO =================
-audioBackground.src = "background.mp3"; // Atualize com seu link no GitHub se necessário
+audioBackground.src = "background.mp3";
 audioReveal.src = "reveal.mp3";
 
 // ================= FUNÇÃO PRINCIPAL =================
 function atualizar(){
   const agora = new Date();
 
-  // Sempre mostra o texto cifrado antes da data
-  if(!revelando && agora < dataLiberacao){
+  // Mostra texto cifrado antes da revelação
+  if(!revelando){
     mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
-  }
-
-  if(debugForcar && !revelando){ iniciarRevelacao(); return; }
-
-  if(agora >= dataLiberacao && !revelando){ 
-    iniciarRevelacao(); 
-    contador.innerHTML = "✨ A mensagem foi revelada ✨";
-    return;
   }
 
   // Contador regressivo
   const diff = dataLiberacao - agora;
-  const d = Math.floor(diff/1000/60/60/24);
-  const h = Math.floor((diff/1000/60/60)%24);
-  const m = Math.floor((diff/1000/60)%60);
-  const s = Math.floor((diff/1000)%60);
-  contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
+  const d=Math.floor(diff/1000/60/60/24);
+  const h=Math.floor((diff/1000/60/60)%24);
+  const m=Math.floor((diff/1000/60)%60);
+  const s=Math.floor((diff/1000)%60);
+
+  if(agora >= dataLiberacao && !revelando){
+    contador.innerHTML="✨ A mensagem foi revelada ✨";
+  } else {
+    contador.innerHTML=`⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
+  }
 }
 
 // ================= REVELAÇÃO =================
 const caracteres="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
 function letraAleatoria(){ return caracteres.charAt(Math.floor(Math.random()*caracteres.length)); }
 
-let linhaAtual=0, charAtual=0, textoAtual="", decodificando=false;
-let velocidadeDigitar = 20; // Menor = mais rápido
+let linhaAtual=0,charAtual=0,textoAtual="",decodificando=false;
 
 function iniciarRevelacao(){
+  const agora = new Date();
   if(revelando) return;
-  revelando=true;
-  localStorage.setItem(storageKey,"true");
+
+  if(agora < dataLiberacao && !debugForcar) return; // Bloqueia antes da data oficial
+
+  revelando = true;
+  localStorage.setItem(storageKey,"true"); // só altera após revelar oficialmente
   mensagem.textContent="";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
   revealButton.style.opacity=0;
   setTimeout(()=>{revealButton.style.display="none"},500);
+
   linhaAtual=0; charAtual=0; textoAtual=""; decodificando=false;
   digitarTexto();
 }
 
 function digitarTexto(){
-  if(linhaAtual<linhas.length){
-    const linha=linhas[linhaAtual];
-    if(charAtual<linha.length){
+  if(linhaAtual < linhas.length){
+    const linha = linhas[linhaAtual];
+    if(charAtual < linha.length){
       if(!decodificando){
         decodificando=true;
         let tentativas=0;
-        const intervalo=setInterval(()=>{
+        const intervalo = setInterval(()=>{
           tentativas++;
           const textoFake=textoAtual+letraAleatoria();
           mensagem.innerHTML=textoFake+'<span class="cursor">|</span>';
-          if(tentativas>2){ // menos tentativas = mais rápido
+          if(tentativas>1){
             clearInterval(intervalo);
             textoAtual+=linha.charAt(charAtual);
             charAtual++;
             decodificando=false;
             digitarTexto();
           }
-        }, velocidadeDigitar);
+        },20); // mais rápido
       }
-    }else{
+    } else {
       textoAtual+="\n\n";
       mensagem.innerHTML=textoAtual+'<span class="cursor">|</span>';
       linhaAtual++;
       charAtual=0;
-      setTimeout(digitarTexto,100); // pausa entre linhas mais rápida
+      setTimeout(digitarTexto,300);
     }
-  }else{
+  } else {
     mensagem.innerHTML=textoAtual;
     const sign=document.createElement("div");
     sign.className="assinatura";
     sign.textContent=assinatura;
     mensagem.appendChild(sign);
-    setTimeout(()=>{ sign.style.opacity=1 },500);
+    setTimeout(()=>{ sign.style.opacity=1 },800);
   }
 }
 
@@ -241,10 +245,9 @@ setInterval(criarNeve,350);
 document.getElementById("debugInput").addEventListener("keydown",(e)=>{
   if(e.key==="Enter"){
     if(e.target.value.trim().toLowerCase()==="flor de gyovana"){
-      debugForcar=true;
+      debugForcar=true; // só ativa temporariamente
       e.target.value="";
       e.target.placeholder="✔ comando aceito";
-      atualizar();
     } else e.target.value="";
   }
 });
@@ -252,19 +255,16 @@ document.getElementById("debugInput").addEventListener("keydown",(e)=>{
 // ================= BOTÃO REVELAR =================
 revealButton.addEventListener("click",()=>{
   audioBackground.play().catch(()=>{});
-  const agora=new Date();
-  if(agora>=dataLiberacao || debugForcar) iniciarRevelacao();
+  iniciarRevelacao(); // só revela se data já chegou ou debug temporário
 });
 
 // ================= INICIAL =================
 if(localStorage.getItem(storageKey)==="true"){
-  iniciarRevelacao();
-}else{
+  iniciarRevelacao(); // mantém revelado se já passado oficialmente
+} else {
   setInterval(atualizar,1000);
   atualizar();
 }
-
 </script>
-
 </body>
 </html>
