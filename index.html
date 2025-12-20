@@ -6,6 +6,7 @@
 <title>🎄 Uma Mensagem está esperando por você 🎄</title>
 
 <style>
+
 body {
   margin: 0;
   background: radial-gradient(circle at top, #132f22, #030b06);
@@ -53,10 +54,49 @@ p {
 
 .assinatura {
   text-align: right;
-  margin-top: 30px;
+  margin-top: 40px;
   font-style: italic;
   opacity: 0;
-  animation: fadeIn 3s forwards;
+  transition: opacity 4s ease;
+}
+
+.cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+}
+
+  #debugBox {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  opacity: 0.25;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+#debugBox:hover {
+  opacity: 1;
+}
+
+#debugInput {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 0.8em;
+  border-radius: 6px;
+  outline: none;
+  width: 160px;
+}
+
+  
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 }
 
 @keyframes fadeIn {
@@ -120,52 +160,114 @@ const mensagem = document.getElementById("mensagem");
 const contador = document.getElementById("contador");
 
 let revelando = false;
+let debugAtivo = false;
+
 
 // ================= FUNÇÃO PRINCIPAL =================
 function atualizar() {
   const agora = new Date();
+  
+    if (debugAtivo && !revelando) {
+    contador.innerHTML = "🧪 Modo de visualização ativado";
+    revelando = true;
+    mensagem.textContent = "";
+    digitarTexto();
+    return;
+  }
 
   if (agora >= dataLiberacao) {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
 
-    if (!revelando) {
-      revelando = true;
-      mensagem.innerHTML = "";
-      revelarLinhas();
-    }
+ if (!revelando) {
+  revelando = true;
+  mensagem.textContent = "";
+  digitarTexto();
+   
+  }
     return;
   }
 
-  const diff = dataLiberacao - agora;
-  const h = Math.floor(diff / 1000 / 60 / 60);
-  const m = Math.floor((diff / 1000 / 60) % 60);
-  const s = Math.floor((diff / 1000) % 60);
+const diff = dataLiberacao - agora;
 
-  contador.innerHTML = `⏳ Algo será revelado em ${h}h ${m}m ${s}s`;
-  mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
+const d = Math.floor(diff / 1000 / 60 / 60 / 24);
+const h = Math.floor((diff / 1000 / 60 / 60) % 24);
+const m = Math.floor((diff / 1000 / 60) % 60);
+const s = Math.floor((diff / 1000) % 60);
+
+contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
+
 }
 
-// ================= REVELAÇÃO LINHA POR LINHA =================
-function revelarLinhas() {
-  linhas.forEach((linha, i) => {
-    setTimeout(() => {
-      const p = document.createElement("p");
-      p.className = "linha";
-      p.textContent = linha;
-      mensagem.appendChild(p);
+// ================= REVELAÇÃO =================
+let linhaAtual = 0;
+let charAtual = 0;
+let textoAtual = "";
 
-      // Assinatura no final
-      if (i === linhas.length - 1) {
-        setTimeout(() => {
-          const sign = document.createElement("div");
-          sign.className = "assinatura";
-          sign.textContent = assinatura;
-          mensagem.appendChild(sign);
-        }, 2500);
+const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
+
+function letraAleatoria() {
+  return caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+}
+
+let linhaAtual = 0;
+let charAtual = 0;
+let textoAtual = "";
+let decodificando = false;
+
+function digitarTexto() {
+  if (linhaAtual < linhas.length) {
+    const linha = linhas[linhaAtual];
+
+    if (charAtual < linha.length) {
+      if (!decodificando) {
+        decodificando = true;
+
+        let tentativas = 0;
+        const intervalo = setInterval(() => {
+          tentativas++;
+
+          const textoFake =
+            textoAtual +
+            letraAleatoria();
+
+          mensagem.innerHTML =
+            textoFake + '<span class="cursor">|</span>';
+
+          if (tentativas > 4) {
+            clearInterval(intervalo);
+            textoAtual += linha.charAt(charAtual);
+            charAtual++;
+            decodificando = false;
+            digitarTexto();
+          }
+        }, 40);
+
       }
-    }, i * 3000);
-  });
+    } else {
+      textoAtual += "\n\n";
+      mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
+      linhaAtual++;
+      charAtual = 0;
+      setTimeout(digitarTexto, 600);
+    }
+
+  } else {
+    // Remove cursor
+    mensagem.innerHTML = textoAtual;
+
+    // Assinatura com fade
+    const sign = document.createElement("div");
+    sign.className = "assinatura";
+    sign.textContent = assinatura;
+    mensagem.appendChild(sign);
+
+    setTimeout(() => {
+      sign.style.opacity = 1;
+    }, 800);
+  }
 }
+
+
 
 setInterval(atualizar, 1000);
 atualizar();
@@ -183,7 +285,27 @@ function criarNeve() {
 }
 
 setInterval(criarNeve, 350);
-</script>
 
+  const debugInput = document.getElementById("debugInput");
+
+debugInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    if (debugInput.value.trim().toLowerCase() === "flor de gyovana") {
+      debugAtivo = true;
+      debugInput.value = "";
+      debugInput.placeholder = "✔ comando aceito";
+    } else {
+      debugInput.value = "";
+    }
+  }
+});
+
+  
+</script>
+  
+<div id="debugBox">
+  <input type="text" id="debugInput" placeholder="⌘ comando secreto">
+</div>
+  
 </body>
 </html>
