@@ -231,44 +231,50 @@ function letraAleatoria() { return caracteres.charAt(Math.floor(Math.random() * 
 
 let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
 
-function iniciarRevelacao() {
-  if (revelando) return;
+function iniciarRevelacao(debug=false) {
+  if (revelando && !debug) return; // não reinicia se já revelando oficialmente
   revelando = true;
+
+  if (!debug) localStorage.setItem(storageKey, "true"); // só salva no modo oficial
+
   mensagem.textContent = "";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
+
   linhaAtual = 0;
   charAtual = 0;
   textoAtual = "";
   decodificando = false;
-  digitarTexto();
+
+  digitarTexto(debug); // passa o parâmetro debug
 }
 
-function digitarTexto() {
+
+function digitarTexto(debug=false) {
   if (linhaAtual < linhas.length) {
     const linha = linhas[linhaAtual];
     if (charAtual < linha.length) {
       if (!decodificando) {
         decodificando = true;
         let tentativas = 0;
-        const intervalo = setInterval(()=>{
+        const intervalo = setInterval(() => {
           tentativas++;
           mensagem.innerHTML = textoAtual + letraAleatoria() + '<span class="cursor">|</span>';
-          if(tentativas>2){
+          if (tentativas > 2) {
             clearInterval(intervalo);
             textoAtual += linha.charAt(charAtual);
             charAtual++;
-            decodificando=false;
-            digitarTexto();
+            decodificando = false;
+            digitarTexto(debug); // passa debug
           }
-        },25);
+        }, 25);
       }
     } else {
       textoAtual += "\n\n";
       mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
       linhaAtual++;
       charAtual = 0;
-      setTimeout(digitarTexto,300);
+      setTimeout(() => digitarTexto(debug), 300);
     }
   } else {
     mensagem.innerHTML = textoAtual;
@@ -276,9 +282,20 @@ function digitarTexto() {
     sign.className = "assinatura";
     sign.textContent = assinatura;
     mensagem.appendChild(sign);
-    setTimeout(()=>{sign.style.opacity=1},800);
+    setTimeout(() => { sign.style.opacity = 1 }, 800);
+
+    // debug: volta ao texto codificado temporariamente
+    if (debug) {
+      setTimeout(() => {
+        revelando = false;
+        mensagem.innerHTML = linhas.map(l => `<p class="hidden">${l}</p>`).join('');
+        audioReveal.pause();
+        audioReveal.currentTime = 0;
+      }, 2000); // tempo suficiente para ver o efeito
+    }
   }
 }
+
 
 // ================= NEVE =================
 function criarNeve() {
@@ -294,21 +311,15 @@ function criarNeve() {
 setInterval(criarNeve,350);
 
 // ================= DEBUG =================
-document.getElementById("debugInput").addEventListener("keydown",(e)=>{
-  if(e.key==="Enter" && e.target.value.trim().toLowerCase()==="flor de gyovana"){
-    debugAtivo = true;
-    audioReveal.play().catch(()=>{});
-    mensagem.innerHTML = linhas.join("<br>");
-    setTimeout(()=>{
-      debugAtivo = false;
-      mensagem.innerHTML = textoCodificado.map(l => `<p class="hidden">${l}</p>`).join('');
-      audioReveal.pause();
-      audioReveal.currentTime = 0;
-    },120000);
-    e.target.value="";
-    e.target.placeholder="✔ comando aceito";
+document.getElementById("debugInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && e.target.value.trim().toLowerCase() === "flor de gyovana") {
+    e.target.value = "";
+    e.target.placeholder = "✔ comando aceito";
+
+    iniciarRevelacao(true); // modo debug: dispara digitação animada temporária
   }
 });
+
 
 // ================= BOTÃO =================
 revealButton.addEventListener("click",()=>{ audioBackground.play().catch(()=>{}); });
