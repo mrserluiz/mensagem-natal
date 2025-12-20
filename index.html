@@ -252,13 +252,19 @@ function letraAleatoria(){ return caracteres.charAt(Math.floor(Math.random()*car
 
 let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
 
-function iniciarRevelacao() {
+function iniciarRevelacao(){
   if(revelando) return;
   revelando = true;
-  localStorage.setItem(storageKey, "true");
-  mensagem.textContent = "";
+  debugForcar = false; // <-- reset debug
+  localStorage.setItem(storageKey,"true");
+  mensagem.textContent="";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
+  revealButton.style.opacity=0;
+  setTimeout(()=>{ revealButton.style.display="none" },500);
+  linhaAtual=0; charAtual=0; textoAtual=""; decodificando=false;
+  digitarTexto();
+}
 
   // Ocultar botão
   revealButton.style.opacity = 0;
