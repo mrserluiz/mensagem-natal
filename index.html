@@ -97,8 +97,6 @@ p {
   100% { opacity: 1; }
 }
 
-}
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -163,38 +161,40 @@ let revelando = false;
 let debugAtivo = false;
 
 
-// ================= FUNÇÃO PRINCIPAL =================
+// ================= FUNÇÃO PRINCIPAL ATULIZAR =================
 function atualizar() {
   const agora = new Date();
-  
+
+  // SE A DATA CHEGOU → REVELA
   if (agora >= dataLiberacao) {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
 
- if (!revelando) {
-  revelando = true;
-  mensagem.textContent = "";
-  digitarTexto();
-   
-  }
+    if (!revelando) {
+      revelando = true;
+      mensagem.textContent = "";
+      digitarTexto();
+    }
     return;
   }
 
-const diff = dataLiberacao - agora;
+  // ANTES DA DATA → MOSTRA TEXTO CIFRADO
+  if (!revelando) {
+    mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
+  }
 
-const d = Math.floor(diff / 1000 / 60 / 60 / 24);
-const h = Math.floor((diff / 1000 / 60 / 60) % 24);
-const m = Math.floor((diff / 1000 / 60) % 60);
-const s = Math.floor((diff / 1000) % 60);
+  // CONTADOR NORMAL
+  const diff = dataLiberacao - agora;
 
-contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
+  const d = Math.floor(diff / 1000 / 60 / 60 / 24);
+  const h = Math.floor((diff / 1000 / 60 / 60) % 24);
+  const m = Math.floor((diff / 1000 / 60) % 60);
+  const s = Math.floor((diff / 1000) % 60);
 
+  contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
 }
 
-// ================= REVELAÇÃO =================
-let linhaAtual = 0;
-let charAtual = 0;
-let textoAtual = "";
 
+// ================= REVELAÇÃO =================
 const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
 
 function letraAleatoria() {
