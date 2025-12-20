@@ -167,14 +167,6 @@ let debugAtivo = false;
 function atualizar() {
   const agora = new Date();
   
-    if (debugAtivo && !revelando) {
-    contador.innerHTML = "🧪 Modo de visualização ativado";
-    revelando = true;
-    mensagem.textContent = "";
-    digitarTexto();
-    return;
-  }
-
   if (agora >= dataLiberacao) {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
 
@@ -291,7 +283,11 @@ setInterval(criarNeve, 350);
 debugInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     if (debugInput.value.trim().toLowerCase() === "flor de gyovana") {
-      debugAtivo = true;
+      if (!revelando) {
+        revelando = true;
+        mensagem.textContent = "";
+        digitarTexto();
+      }
       debugInput.value = "";
       debugInput.placeholder = "✔ comando aceito";
     } else {
@@ -299,7 +295,6 @@ debugInput.addEventListener("keydown", (e) => {
     }
   }
 });
-
   
 </script>
   
