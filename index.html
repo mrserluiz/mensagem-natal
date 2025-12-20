@@ -279,14 +279,14 @@ function digitarTexto() {
           tentativas++;
           const textoFake = textoAtual + letraAleatoria();
           mensagem.innerHTML = textoFake + '<span class="cursor">|</span>';
-          if(tentativas>4){
+          if(tentativas>2){
             clearInterval(intervalo);
             textoAtual += linha.charAt(charAtual);
             charAtual++;
             decodificando=false;
             digitarTexto();
           }
-        },40);
+        },15);
       }
     } else {
       textoAtual += "\n\n";
