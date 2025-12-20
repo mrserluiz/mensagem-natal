@@ -23,10 +23,7 @@ body {
   box-shadow: 0 0 30px rgba(255,255,255,0.08);
 }
 
-h1 {
-  text-align: center;
-  font-size: 1.6em;
-}
+h1 { text-align: center; font-size: 1.6em; }
 
 .contador {
   text-align: center;
@@ -59,35 +56,25 @@ h1 {
   transition: opacity 4s ease;
 }
 
-.cursor {
-  display: inline-block;
-  margin-left: 2px;
-  animation: blink 1s infinite;
-}
+.cursor { display: inline-block; margin-left: 2px; animation: blink 1s infinite; }
 
-#debugBox {
+.hidden { opacity: 0.15; }
+
+.snowflake {
   position: fixed;
-  bottom: 12px;
-  left: 12px;
-  opacity: 0.25;
-  transition: opacity 0.3s ease;
-  z-index: 999;
-}
-
-#debugBox:hover { opacity: 1; }
-
-#debugInput {
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
-  padding: 6px 10px;
-  font-size: 0.8em;
-  border-radius: 6px;
-  outline: none;
-  width: 160px;
+  top: -10px;
+  color: white;
+  opacity: 0.7;
+  pointer-events: none;
+  animation: fall linear infinite;
 }
 
 @keyframes blink { 0%{opacity:1}50%{opacity:0}100%{opacity:1} }
+@keyframes fall { to { transform: translateY(110vh); } }
+
+@media (max-width: 600px){
+  .container { margin: 20px; padding: 22px; }
+}
 </style>
 </head>
 
@@ -111,77 +98,12 @@ h1 {
 
 <script>
 // ================= CONFIG =================
-const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
+const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0);
 const storageKey = "mensagemRevelada";
 
 // ================= TEXTOS =================
-const textoCifrado =
-  [
-  "Jó fócz ra ykdf oco wd yfbmzje t qf hhvuzra zy mcsso ptyo.",
-"Czsks hqt qbt tchg vvtt eukpbcra, fqpfyo avtrdzmrr.",
-"Cqx yjcvz xrsgrg ztbgvxs, rmv jgbsz fvhbs bfe iqx et pzg, cs zkcfs fgqf izq ypgqk oc vkncs csgxv.",
-"Vxfrd lbgzy tbê wz dgsxk, fgz wt gpmpfe akpôqqc, fgz wt vzftff fnhbzdtzt.",
-"Jpwsr ts rpuo g fzycmu vyxkbwt tzgnwgg trr uqbvzm, rq dvmfrfc, rq mccyprz, rq sfytrdse vtsky.",
-"Dmsd jq tgbdm vbtfzhq jgcrqz cst hspt ds brgpx, rq hyyzt xqbb rglz gj vgrc.",
-"Rq thhzfg fzxx z ggszrfc tgx xrfcmf ts ftppq, cs gzoqr à etvxfêozz.",
-"Çvê rq jwv gqgq hv zrs wkqw lffy gvtgxtf y kf lszd ffyy xgsnvgg qhsyq bbrfyx.",
-"D zlb cs vksdb bfy p bb xzr gqvygvv z mtjcs.",
-"Sg vtfxzqs ph xgvqyyvr, xt rfrlt, rfd rq vpcê qgrz.",
-"Zvhq gkmz kvm rz zlrwx xrd q mvm rbl ptzq z gqj ty qzqy.",
-"T zzê dsdyl gr wfbivv mlf tpp hiy, rmts xt xppss yxxz btp hdhvsy wrn hcfkq zgzav.",
-"Jdkq zârz vrxt pq dvpxs z qk xr hswnfqfzw dvw jxxtvvx.",
-"Fqg rzct dmtxg x bts bts fypbhksl, xypdss wpzyrg sg vtgntgg hdbfyx.",
-"Vjfq sb wgdvtrb wv tzhvcyx bxs tvyynzr wgsx vkpzh fws zsvm tfdçvv bppfpz jtyjvqhz rq hskwm.",
-"Jtswb pprfdy.",
-"Qd zgzxz ztqz dzhx zy bzxw vyxlhhs, ztdfrg az xwspjbrf jgfr.",
-"Fqzjtyx avds, vmvbfv ksdz jskkbf b khffbf.",
-"Tnyzf x bfe ztkp, tyvqx vgmghf t bggvryx xgrz qk vgtczw.",
-"Cvrh fz qyppbb tv dtxzsz fzxx fvrkbh tbt hdfcttzv.",
-"Rzygr jfkz, sx fzdfe bvrfdg.",
-"Stpvv rfd rp wbg jgpc ptyo uqjv, whldg tgbx fqpfhs.",
-"Hfszgt qg qkzddr jgfrz, ngfr ggm czx ds kpbqpzz.",
-"Fhgz rz zssbgpdtf.",
-"Hsd zsnxzqz pqx aofê dzn lzzf z bgdcm kgg kgyv.",
-"Bb ztqzf gvdzhx, zxxc.",
-"Jx qxpjwbbf xrd gzdgm fvpdrs jgfrz.",
-"Jtswb zdkp qzjv fbgxtgyv tppfpz pgrz, gyljz t fzxxzqv.",
-"Xg zdgvt zshqz qk bts bts jgfrz.",
-"M hx wfpfxk zpwxr vchbg, fbgcszq ts tsr bfdj qthx.",
-"Hyqlcf tzsssfq z vvrhtf wrn bgdj zthzrg, ggm zs mxry zpsf.",
-"Zgkz Xksrz, zg tbgdvt fzhbgg gsp ztqz trgsxk zvr lzjh.",
-"Ksw jgfrz rzqv tdx tgpdrt pwg gk.",
-"Vdkz jgfrz bfe zs bzkdr gspg pqf gkdvftz, pzqrfkz, zfê gkdvftz.",
-"Jdkq zvr lzjh.",
-  ];
-
-const linhas = [
-"Há algo em você que me acalma e me desarma ao mesmo tempo.",
-"Algo que não pede explicação, apenas presença.",
-"Nos seus gestos simples e nas suas mensagens do dia a dia, encontro um lugar seguro.",
-"No jeito leve com que você entra na minha rotina, eu me sinto em casa.",
-"Quando penso em você, não penso em perfeição, penso nas suas falas verdadeiras.",
-"Gosto de como a nossa história acontece sem pressa, no cuidado e na atenção.",
-"Nas pequenas coisas do dia a dia, você me deixa chegar à sua vida.",
-"Nos risos fora de hora e nas noites cansadas que terminam em carinho, mesmo à distância.",
-"Até nos dias em que o sono vence e ainda assim queremos continuar conversando.",
-"Você me ensinou que estar junto também é respeitar o tempo do outro.",
-"O cansaço e o silêncio também podem ser formas de cuidado.",
-"Te ver se divertir, se soltar e rir de você mesma me alegra e me faz rir junto.",
-"Quando você se abre e confia em mim nos seus piores momentos, eu fico de coração aberto.",
-"Não quero só os seus melhores dias, quero você inteira.",
-"Nos dias leves e nos difíceis.",
-"Se eu pudesse escolher, estaria ao seu lado para cuidar, acolher e dividir cada detalhe.",
-"Mesmo os detalhes mais simples.",
-"Neste Natal, agradeço por você existir na minha vida do jeito que é.",
-"Esse jeito não deve mudar, pois é por ele que sou apaixonado.",
-"Agradeço por me permitir sentir, criar confiança e aprender a crescer.",
-"O que sinto por você é tranquilo, forte e verdadeiro.",
-"É escolher estar, cuidar e seguir construindo, dia após dia.",
-"Quero que você se sinta amada, respeitada e segura.",
-"Quero ser carinho, verdade e um companheiro de coração aberto.",
-"Hoje e sempre.",
-];
-
+const textoCifrado = `"por texto codificado aqui..."`;
+const linhas = ["por texto aqui","por texto aqui","por texto aqui"];
 const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 
 // ================= ELEMENTOS =================
@@ -199,81 +121,81 @@ audioBackground.src = "background.mp3";
 audioReveal.src = "reveal.mp3";
 
 // ================= FUNÇÃO PRINCIPAL =================
-function atualizar() {
+function atualizar(){
   const agora = new Date();
+  if(debugForcar && !revelando){ iniciarRevelacao(); return; }
 
-  // Debug
-  if (debugForcar && !revelando) { iniciarRevelacao(); return; }
-
-  if (agora >= dataLiberacao) {
-    contador.innerHTML = "✨ A mensagem foi revelada ✨";
-    if (!revelando) iniciarRevelacao();
+  if(agora>=dataLiberacao){
+    contador.innerHTML="✨ A mensagem foi revelada ✨";
+    if(!revelando) iniciarRevelacao();
     return;
   }
 
-  if (!revelando) { mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`; }
+  if(!revelando){
+    mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
+  }
 
   const diff = dataLiberacao - agora;
-  const d = Math.floor(diff / 1000 / 60 / 60 / 24);
-  const h = Math.floor((diff / 1000 / 60 / 60) % 24);
-  const m = Math.floor((diff / 1000 / 60) % 60);
-  const s = Math.floor((diff / 1000) % 60);
-  contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
+  const d=Math.floor(diff/1000/60/60/24);
+  const h=Math.floor((diff/1000/60/60)%24);
+  const m=Math.floor((diff/1000/60)%60);
+  const s=Math.floor((diff/1000)%60);
+  contador.innerHTML=`⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
 }
 
 // ================= REVELAÇÃO =================
-const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
+const caracteres="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
 function letraAleatoria(){ return caracteres.charAt(Math.floor(Math.random()*caracteres.length)); }
 
-let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
+let linhaAtual=0,charAtual=0,textoAtual="",decodificando=false;
 
-function iniciarRevelacao() {
+function iniciarRevelacao(){
   if(revelando) return;
-  revelando = true;
+  revelando=true;
   localStorage.setItem(storageKey,"true");
   mensagem.textContent="";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
-  revealButton.style.opacity = 0;
-  setTimeout(()=>{ revealButton.style.display="none"; },500);
-  linhaAtual = 0; charAtual = 0; textoAtual = ""; decodificando=false;
+  revealButton.style.opacity=0;
+  setTimeout(()=>{revealButton.style.display="none"},500);
+  linhaAtual=0; charAtual=0; textoAtual=""; decodificando=false;
   digitarTexto();
 }
 
-function digitarTexto() {
-  if(linhaAtual < linhas.length){
-    const linha = linhas[linhaAtual];
-    if(charAtual < linha.length){
+function digitarTexto(){
+  if(linhaAtual<linhas.length){
+    const linha=linhas[linhaAtual];
+    if(charAtual<linha.length){
       if(!decodificando){
         decodificando=true;
         let tentativas=0;
-        const intervalo = setInterval(()=>{
+        const intervalo=setInterval(()=>{
           tentativas++;
-          const textoFake = textoAtual + letraAleatoria();
-          mensagem.innerHTML = textoFake + '<span class="cursor">|</span>';
+          const textoFake=textoAtual+letraAleatoria();
+          mensagem.innerHTML=textoFake+'<span class="cursor">|</span>';
           if(tentativas>4){
             clearInterval(intervalo);
-            textoAtual += linha.charAt(charAtual);
+            textoAtual+=linha.charAt(charAtual);
             charAtual++;
             decodificando=false;
             digitarTexto();
           }
         },40);
       }
-    } else {
-      textoAtual += "\n\n";
-      mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
+    }else{
+      textoAtual+="\n\n";
+      mensagem.innerHTML=textoAtual+'<span class="cursor">|</span>';
       linhaAtual++;
       charAtual=0;
       setTimeout(digitarTexto,600);
     }
-  } else {
+  }else{
     mensagem.innerHTML=textoAtual;
     const sign=document.createElement("div");
     sign.className="assinatura";
     sign.textContent=assinatura;
     mensagem.appendChild(sign);
-    setTimeout(()=>{ sign.style.opacity=1; },800);
+    setTimeout(()=>{ sign.style.opacity=1 },800);
   }
 }
 
@@ -291,35 +213,32 @@ function criarNeve(){
 setInterval(criarNeve,350);
 
 // ================= DEBUG =================
-const debugInput=document.getElementById("debugInput");
-debugInput.addEventListener("keydown",(e)=>{
+document.getElementById("debugInput").addEventListener("keydown",(e)=>{
   if(e.key==="Enter"){
-    if(debugInput.value.trim().toLowerCase()==="flor de gyovana"){
+    if(e.target.value.trim().toLowerCase()==="flor de gyovana"){
       debugForcar=true;
-      debugInput.value="";
-      debugInput.placeholder="✔ comando aceito";
+      e.target.value="";
+      e.target.placeholder="✔ comando aceito";
       atualizar();
-    } else debugInput.value="";
+    } else e.target.value="";
   }
 });
 
 // ================= BOTÃO REVELAR =================
-revealButton.addEventListener("click", ()=>{
+revealButton.addEventListener("click",()=>{
   audioBackground.play().catch(()=>{});
-  const agora = new Date();
-  if(agora >= dataLiberacao || debugForcar){
-    iniciarRevelacao();
-  }
+  const agora=new Date();
+  if(agora>=dataLiberacao || debugForcar) iniciarRevelacao();
 });
 
 // ================= INICIAL =================
 if(localStorage.getItem(storageKey)==="true"){
   iniciarRevelacao();
-} else {
+}else{
   setInterval(atualizar,1000);
   atualizar();
 }
-</script>
 
+</script>
 </body>
 </html>
