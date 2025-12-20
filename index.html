@@ -117,11 +117,9 @@ h1 { text-align: center; font-size: 1.6em; }
 <audio id="audioReveal"></audio>
 
 <script>
-// ================= CONFIG =================
 const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0);
 const storageKey = "mensagemRevelada";
 
-// ================= TEXTOS =================
 const linhas = [
   "por texto aqui",
   "por texto aqui",
@@ -129,7 +127,6 @@ const linhas = [
 ];
 const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 
-// ================= ELEMENTOS =================
 const mensagem = document.getElementById("mensagem");
 const contador = document.getElementById("contador");
 const revealButton = document.getElementById("revealButton");
@@ -139,13 +136,17 @@ const audioReveal = document.getElementById("audioReveal");
 let revelando = false;
 let debugAtivo = false;
 
-// ================= AUDIO =================
 audioBackground.src = "background.mp3";
 audioReveal.src = "reveal.mp3";
 
-// ================= FUNÇÃO PRINCIPAL =================
+// ================= FUNÇÃO ATUALIZAR =================
 function atualizar() {
   const agora = new Date();
+
+  // Antes da data: mostrar sempre o texto codificado
+  if (!revelando && !debugAtivo) {
+    mensagem.innerHTML = `<p class="hidden">"Texto codificado visível antes da hora..."</p>`;
+  }
 
   // Contador regressivo
   if (agora < dataLiberacao) {
@@ -155,14 +156,12 @@ function atualizar() {
     const m = Math.floor((diff / 1000 / 60) % 60);
     const s = Math.floor((diff / 1000) % 60);
     contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
-
-    // Antes da data, mostrar sempre texto codificado
-    if (!revelando && !debugAtivo) {
-      mensagem.innerHTML = `<p class="hidden">"Texto codificado visível antes da hora..."</p>`;
-    }
   } else {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
-    if (!revelando) iniciarRevelacao();
+    // Só iniciar revelação se ainda não foi feita oficialmente
+    if (!revelando && localStorage.getItem(storageKey)!=="true") {
+      iniciarRevelacao();
+    }
   }
 }
 
@@ -170,17 +169,15 @@ function atualizar() {
 const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
 function letraAleatoria() { return caracteres.charAt(Math.floor(Math.random() * caracteres.length)); }
 
-let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
+let linhaAtual=0, charAtual=0, textoAtual="", decodificando=false;
 
 function iniciarRevelacao() {
   if (revelando) return;
   revelando = true;
-  localStorage.setItem(storageKey,"true");
+  localStorage.setItem(storageKey,"true"); // só grava quando real
   mensagem.textContent = "";
   audioBackground.pause();
   audioReveal.play().catch(()=>{});
-  revealButton.style.opacity=0;
-  setTimeout(()=>{revealButton.style.display="none"},500);
   linhaAtual=0; charAtual=0; textoAtual=""; decodificando=false;
   digitarTexto();
 }
@@ -191,75 +188,76 @@ function digitarTexto() {
     if (charAtual < linha.length) {
       if (!decodificando) {
         decodificando = true;
-        let tentativas = 0;
-        const intervalo = setInterval(() => {
+        let tentativas=0;
+        const intervalo=setInterval(()=>{
           tentativas++;
           mensagem.innerHTML = textoAtual + letraAleatoria() + '<span class="cursor">|</span>';
-          if (tentativas > 2) {
+          if(tentativas>2){
             clearInterval(intervalo);
             textoAtual += linha.charAt(charAtual);
             charAtual++;
-            decodificando = false;
+            decodificando=false;
             digitarTexto();
           }
-        }, 25);
+        },25);
       }
     } else {
       textoAtual += "\n\n";
       mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
       linhaAtual++;
-      charAtual = 0;
-      setTimeout(digitarTexto, 300);
+      charAtual=0;
+      setTimeout(digitarTexto,300);
     }
   } else {
     mensagem.innerHTML = textoAtual;
-    const sign = document.createElement("div");
-    sign.className = "assinatura";
-    sign.textContent = assinatura;
+    const sign=document.createElement("div");
+    sign.className="assinatura";
+    sign.textContent=assinatura;
     mensagem.appendChild(sign);
-    setTimeout(()=>{ sign.style.opacity=1 }, 800);
+    setTimeout(()=>{sign.style.opacity=1},800);
   }
 }
 
 // ================= NEVE =================
 function criarNeve() {
-  const floco = document.createElement("div");
-  floco.className = "snowflake";
-  floco.innerHTML = "❄";
-  floco.style.left = Math.random() * window.innerWidth + "px";
-  floco.style.animationDuration = (6 + Math.random() * 6) + "s";
-  floco.style.fontSize = (10 + Math.random() * 18) + "px";
+  const floco=document.createElement("div");
+  floco.className="snowflake";
+  floco.innerHTML="❄";
+  floco.style.left = Math.random()*window.innerWidth + "px";
+  floco.style.animationDuration = (6+Math.random()*6)+"s";
+  floco.style.fontSize = (10+Math.random()*18)+"px";
   document.body.appendChild(floco);
-  setTimeout(() => floco.remove(), 12000);
+  setTimeout(()=>floco.remove(),12000);
 }
-setInterval(criarNeve, 350);
+setInterval(criarNeve,350);
 
 // ================= DEBUG =================
-document.getElementById("debugInput").addEventListener("keydown", (e)=>{
+document.getElementById("debugInput").addEventListener("keydown",(e)=>{
   if(e.key==="Enter" && e.target.value.trim().toLowerCase()==="flor de gyovana"){
-    debugAtivo = true;
+    debugAtivo=true;
     audioReveal.play().catch(()=>{});
     mensagem.innerHTML = linhas.join("<br>");
     setTimeout(()=>{
-      debugAtivo = false;
+      debugAtivo=false;
       mensagem.innerHTML = `<p class="hidden">"Texto codificado visível antes da hora..."</p>`;
       audioReveal.pause();
-      audioReveal.currentTime = 0;
+      audioReveal.currentTime=0;
     },5000);
-    e.target.value = "";
-    e.target.placeholder = "✔ comando aceito";
+    e.target.value="";
+    e.target.placeholder="✔ comando aceito";
   }
 });
 
-// ================= BOTÃO REVELAR =================
-revealButton.addEventListener("click", ()=>{
-  audioBackground.play().catch(()=>{});
-});
+// ================= BOTÃO =================
+revealButton.addEventListener("click",()=>{ audioBackground.play().catch(()=>{}); });
 
 // ================= INICIAL =================
-setInterval(atualizar, 1000);
+setInterval(atualizar,1000);
 atualizar();
-if(localStorage.getItem(storageKey)==="true") iniciarRevelacao();
+
+if(localStorage.getItem(storageKey)==="true"){
+  iniciarRevelacao();
+}
 </script>
 
 </body>
