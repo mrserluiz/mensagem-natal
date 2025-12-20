@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head><!DOCTYPE html>
-<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -105,7 +103,7 @@ h1 { text-align: center; font-size: 1.6em; }
 <div class="container">
   <h1>🎄 Algo especial está guardado aqui 🎁 </h1>
   <div class="contador" id="contador"></div>
-  <div id="mensagem"></div>
+  <div id="mensagem"><p class="hidden">"Texto codificado visível antes da hora..."</p></div>
   <button id="revealButton">🎵 Tocar música</button>
 </div>
 
@@ -120,18 +118,15 @@ h1 { text-align: center; font-size: 1.6em; }
 
 <script>
 // ================= CONFIG =================
-const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
+const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0);
 const storageKey = "mensagemRevelada";
 
 // ================= TEXTOS =================
-const textoCifrado = `"Texto codificado visível antes da hora..."`;
-
 const linhas = [
   "por texto aqui",
   "por texto aqui",
   "por texto aqui"
 ];
-
 const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 
 // ================= ELEMENTOS =================
@@ -145,17 +140,12 @@ let revelando = false;
 let debugAtivo = false;
 
 // ================= AUDIO =================
-audioBackground.src = "background.mp3"; // atualizar se necessário
+audioBackground.src = "background.mp3";
 audioReveal.src = "reveal.mp3";
 
 // ================= FUNÇÃO PRINCIPAL =================
 function atualizar() {
   const agora = new Date();
-
-  // Texto codificado sempre visível antes da data
-  if (!revelando && !debugAtivo) {
-    mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
-  }
 
   // Contador regressivo
   if (agora < dataLiberacao) {
@@ -165,6 +155,11 @@ function atualizar() {
     const m = Math.floor((diff / 1000 / 60) % 60);
     const s = Math.floor((diff / 1000) % 60);
     contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
+
+    // Antes da data, mostrar sempre texto codificado
+    if (!revelando && !debugAtivo) {
+      mensagem.innerHTML = `<p class="hidden">"Texto codificado visível antes da hora..."</p>`;
+    }
   } else {
     contador.innerHTML = "✨ A mensagem foi revelada ✨";
     if (!revelando) iniciarRevelacao();
@@ -199,9 +194,8 @@ function digitarTexto() {
         let tentativas = 0;
         const intervalo = setInterval(() => {
           tentativas++;
-          const textoFake = textoAtual + letraAleatoria();
-          mensagem.innerHTML = textoFake + '<span class="cursor">|</span>';
-          if (tentativas > 2) { // digitação rápida
+          mensagem.innerHTML = textoAtual + letraAleatoria() + '<span class="cursor">|</span>';
+          if (tentativas > 2) {
             clearInterval(intervalo);
             textoAtual += linha.charAt(charAtual);
             charAtual++;
@@ -242,21 +236,18 @@ setInterval(criarNeve, 350);
 
 // ================= DEBUG =================
 document.getElementById("debugInput").addEventListener("keydown", (e)=>{
-  if(e.key==="Enter"){
-    if(e.target.value.trim().toLowerCase()==="flor de gyovana"){
-      debugAtivo = true;
-      audioReveal.play().catch(()=>{});
-      // mostrar mensagem temporariamente
-      mensagem.innerHTML = linhas.join("<br>");
-      setTimeout(()=>{ 
-        debugAtivo = false; 
-        mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`; 
-        audioReveal.pause();
-        audioReveal.currentTime = 0;
-      }, 5000); // volta ao normal após 5s
-      e.target.value = "";
-      e.target.placeholder = "✔ comando aceito";
-    } else e.target.value="";
+  if(e.key==="Enter" && e.target.value.trim().toLowerCase()==="flor de gyovana"){
+    debugAtivo = true;
+    audioReveal.play().catch(()=>{});
+    mensagem.innerHTML = linhas.join("<br>");
+    setTimeout(()=>{
+      debugAtivo = false;
+      mensagem.innerHTML = `<p class="hidden">"Texto codificado visível antes da hora..."</p>`;
+      audioReveal.pause();
+      audioReveal.currentTime = 0;
+    },5000);
+    e.target.value = "";
+    e.target.placeholder = "✔ comando aceito";
   }
 });
 
@@ -268,337 +259,7 @@ revealButton.addEventListener("click", ()=>{
 // ================= INICIAL =================
 setInterval(atualizar, 1000);
 atualizar();
-
-// Caso a mensagem já tenha sido revelada
-if(localStorage.getItem(storageKey)==="true") {
-  iniciarRevelacao();
-}
-</script>
-
-</body>
-</html>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎄 Uma Mensagem está esperando por você 🎄</title>
-
-<style>
-body {
-  margin: 0;
-  background: radial-gradient(circle at top, #132f22, #030b06);
-  color: #f3f7f5;
-  font-family: 'Georgia', serif;
-  overflow-x: hidden;
-}
-
-.container {
-  max-width: 820px;
-  margin: 60px auto;
-  padding: 28px;
-  background: rgba(0,0,0,0.55);
-  border-radius: 14px;
-  box-shadow: 0 0 30px rgba(255,255,255,0.08);
-}
-
-h1 { text-align: center; font-size: 1.6em; }
-
-.contador {
-  text-align: center;
-  margin: 20px 0 30px;
-  font-size: 1.1em;
-  letter-spacing: 1px;
-  color: #d7ede2;
-}
-
-#revealButton {
-  display: block;
-  margin: 20px auto;
-  padding: 12px 20px;
-  font-size: 1em;
-  border: none;
-  border-radius: 8px;
-  background: #d7ede2;
-  color: #132f22;
-  cursor: pointer;
-  transition: opacity 0.5s;
-}
-
-#revealButton:hover { background: #c4ded5; }
-
-.assinatura {
-  text-align: right;
-  margin-top: 40px;
-  font-style: italic;
-  opacity: 0;
-  transition: opacity 4s ease;
-}
-
-.cursor { display: inline-block; margin-left: 2px; animation: blink 1s infinite; }
-
-.hidden { opacity: 0.15; }
-
-.snowflake {
-  position: fixed;
-  top: -10px;
-  color: white;
-  opacity: 0.7;
-  pointer-events: none;
-  animation: fall linear infinite;
-}
-
-@keyframes blink { 0%{opacity:1}50%{opacity:0}100%{opacity:1} }
-@keyframes fall { to { transform: translateY(110vh); } }
-
-@media (max-width: 600px){
-  .container { margin: 20px; padding: 22px; }
-}
-
-/* Caixa discreta de debug */
-#debugBox {
-  position: fixed;
-  bottom: 12px;
-  left: 12px;
-  opacity: 0.15;
-  z-index: 999;
-}
-
-#debugInput {
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
-  padding: 6px 10px;
-  font-size: 0.8em;
-  border-radius: 6px;
-  outline: none;
-  width: 160px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-  <h1>🎄 Algo especial está guardado aqui 🎁 </h1>
-  <div class="contador" id="contador"></div>
-  <div id="mensagem"></div>
-  <button id="revealButton">🎵 Tocar música</button>
-</div>
-
-<!-- Debug discreto -->
-<div id="debugBox">
-  <input type="text" id="debugInput" placeholder="⌘ comando secreto">
-</div>
-
-<!-- Áudio -->
-<audio id="audioBackground" loop></audio>
-<audio id="audioReveal"></audio>
-
-<script>
-// ================= CONFIG =================
-const dataLiberacao = new Date(2025, 11, 25, 0, 2, 0); // 25/12/2025 00:02
-const storageKey = "mensagemRevelada";
-
-// ================= TEXTOS =================
-const textoCifrado =
-  
-  [
-    "Jó fócz ra ykdf oco wd yfbmzje t qf hhvuzra zy mcsso ptyo.",
-"Czsks hqt qbt tchg vvtt eukpbcra, fqpfyo avtrdzmrr.",
-"Cqx yjcvz xrsgrg ztbgvxs, rmv jgbsz fvhbs bfe iqx et pzg, cs zkcfs fgqf izq ypgqk oc vkncs csgxv.",
-"Vxfrd lbgzy tbê wz dgsxk, fgz wt gpmpfe akpôqqc, fgz wt vzftff fnhbzdtzt.",
-"Jpwsr ts rpuo g fzycmu vyxkbwt tzgnwgg trr uqbvzm, rq dvmfrfc, rq mccyprz, rq sfytrdse vtsky.",
-"Dmsd jq tgbdm vbtfzhq jgcrqz cst hspt ds brgpx, rq hyyzt xqbb rglz gj vgrc.",
-"Rq thhzfg fzxx z ggszrfc tgx xrfcmf ts ftppq, cs gzoqr à etvxfêozz.",
-"Çvê rq jwv gqgq hv zrs wkqw lffy gvtgxtf y kf lszd ffyy xgsnvgg qhsyq bbrfyx.",
-"D zlb cs vksdb bfy p bb xzr gqvygvv z mtjcs.",
-"Sg vtfxzqs ph xgvqyyvr, xt rfrlt, rfd rq vpcê qgrz.",
-"Zvhq gkmz kvm rz zlrwx xrd q mvm rbl ptzq z gqj ty qzqy.",
-"T zzê dsdyl gr wfbivv mlf tpp hiy, rmts xt xppss yxxz btp hdhvsy wrn hcfkq zgzav.",
-"Jdkq zârz vrxt pq dvpxs z qk xr hswnfqfzw dvw jxxtvvx.",
-"Fqg rzct dmtxg x bts bts fypbhksl, xypdss wpzyrg sg vtgntgg hdbfyx.",
-"Vjfq sb wgdvtrb wv tzhvcyx bxs tvyynzr wgsx vkpzh fws zsvm tfdçvv bppfpz jtyjvqhz rq hskwm.",
-"Jtswb pprfdy.",
-"Qd zgzxz ztqz dzhx zy bzxw vyxlhhs, ztdfrg az xwspjbrf jgfr.",
-"Fqzjtyx avds, vmvbfv ksdz jskkbf b khffbf.",
-"Tnyzf x bfe ztkp, tyvqx vgmghf t bggvryx xgrz qk vgtczw.",
-"Cvrh fz qyppbb tv dtxzsz fzxx fvrkbh tbt hdfcttzv.",
-"Rzygr jfkz, sx fzdfe bvrfdg.",
-"Stpvv rfd rp wbg jgpc ptyo uqjv, whldg tgbx fqpfhs.",
-"Hfszgt qg qkzddr jgfrz, ngfr ggm czx ds kpbqpzz.",
-"Fhgz rz zssbgpdtf.",
-"Hsd zsnxzqz pqx aofê dzn lzzf z bgdcm kgg kgyv.",
-"Bb ztqzf gvdzhx, zxxc.",
-"Jx qxpjwbbf xrd gzdgm fvpdrs jgfrz.",
-"Jtswb zdkp qzjv fbgxtgyv tppfpz pgrz, gyljz t fzxxzqv.",
-"Xg zdgvt zshqz qk bts bts jgfrz.",
-"M hx wfpfxk zpwxr vchbg, fbgcszq ts tsr bfdj qthx.",
-"Hyqlcf tzsssfq z vvrhtf wrn bgdj zthzrg, ggm zs mxry zpsf.",
-"Zgkz Xksrz, zg tbgdvt fzhbgg gsp ztqz trgsxk zvr lzjh.",
-"Ksw jgfrz rzqv tdx tgpdrt pwg gk.",
-"Vdkz jgfrz bfe zs bzkdr gspg pqf gkdvftz, pzqrfkz, zfê gkdvftz.",
-"Jdkq zvr lzjh.",
-  ];
-
-const linhas = 
-  [
-"Há algo em você que me acalma e me desarma ao mesmo tempo.",
-"Algo que não pede explicação, apenas presença.",
-"Nos seus gestos simples e nas suas mensagens do dia a dia, encontro um lugar seguro.",
-"No jeito leve com que você entra na minha rotina, eu me sinto em casa.",
-"Quando penso em você, não penso em perfeição, penso nas suas falas verdadeiras.",
-"Gosto de como a nossa história acontece sem pressa, no cuidado e na atenção.",
-"Nas pequenas coisas do dia a dia, você me deixa chegar à sua vida.",
-"Nos risos fora de hora e nas noites cansadas que terminam em carinho, mesmo à distância.",
-"Até nos dias em que o sono vence e ainda assim queremos continuar conversando.",
-"Você me ensinou que estar junto também é respeitar o tempo do outro.",
-"O cansaço e o silêncio também podem ser formas de cuidado.",
-"Te ver se divertir, se soltar e rir de você mesma me alegra e me faz rir junto.",
-"Quando você se abre e confia em mim nos seus piores momentos, eu fico de coração aberto.",
-"Não quero só os seus melhores dias, quero você inteira.",
-"Nos dias leves e nos difíceis.",
-"Se eu pudesse escolher, estaria ao seu lado para cuidar, acolher e dividir cada detalhe.",
-"Mesmo os detalhes mais simples.",
-"Neste Natal, agradeço por você existir na minha vida do jeito que é.",
-"Esse jeito não deve mudar, pois é por ele que sou apaixonado.",
-"Agradeço por me permitir sentir, criar confiança e aprender a crescer.",
-"O que sinto por você é tranquilo, forte e verdadeiro.",
-"É escolher estar, cuidar e seguir construindo, dia após dia.",
-"Quero que você se sinta amada, respeitada e segura.",
-"Quero ser carinho, verdade e um companheiro de coração aberto.",
-"Hoje e sempre.",
-  ];
-
-const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
-
-// ================= ELEMENTOS =================
-const mensagem = document.getElementById("mensagem");
-const contador = document.getElementById("contador");
-const revealButton = document.getElementById("revealButton");
-const audioBackground = document.getElementById("audioBackground");
-const audioReveal = document.getElementById("audioReveal");
-
-let revelando = false;
-let debugForcar = false;
-
-// ================= AUDIO =================
-audioBackground.src = "background.mp3"; // atualizar se necessário
-audioReveal.src = "reveal.mp3";
-
-// ================= FUNÇÃO PRINCIPAL =================
-function atualizar() {
-  const agora = new Date();
-
-  // Chegou o dia da revelação
-  if (agora >= dataLiberacao) {
-    contador.innerHTML = "✨ A mensagem foi revelada ✨";
-    if (!revelando) iniciarRevelacao();
-  } else if (!revelando) {
-    // Antes da data → mostra texto codificado
-    mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
-  }
-
-  // Contador regressivo
-  const diff = dataLiberacao - agora;
-  const d = Math.floor(diff / 1000 / 60 / 60 / 24);
-  const h = Math.floor((diff / 1000 / 60 / 60) % 24);
-  const m = Math.floor((diff / 1000 / 60) % 60);
-  const s = Math.floor((diff / 1000) % 60);
-  contador.innerHTML = `⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
-}
-
-// ================= REVELAÇÃO =================
-const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*";
-function letraAleatoria() { return caracteres.charAt(Math.floor(Math.random() * caracteres.length)); }
-
-let linhaAtual = 0, charAtual = 0, textoAtual = "", decodificando = false;
-
-function iniciarRevelacao() {
-  if (revelando) return;
-  revelando = true;
-  localStorage.setItem(storageKey,"true");
-  mensagem.textContent = "";
-  audioBackground.pause();
-  audioReveal.play().catch(()=>{});
-  revealButton.style.opacity=0;
-  setTimeout(()=>{revealButton.style.display="none"},500);
-  linhaAtual=0; charAtual=0; textoAtual=""; decodificando=false;
-  digitarTexto();
-}
-
-function digitarTexto() {
-  if (linhaAtual < linhas.length) {
-    const linha = linhas[linhaAtual];
-    if (charAtual < linha.length) {
-      if (!decodificando) {
-        decodificando = true;
-        let tentativas = 0;
-        const intervalo = setInterval(() => {
-          tentativas++;
-          const textoFake = textoAtual + letraAleatoria();
-          mensagem.innerHTML = textoFake + '<span class="cursor">|</span>';
-          if (tentativas > 2) { // digitação mais rápida
-            clearInterval(intervalo);
-            textoAtual += linha.charAt(charAtual);
-            charAtual++;
-            decodificando = false;
-            digitarTexto();
-          }
-        }, 25); // intervalo menor para digitação rápida
-      }
-    } else {
-      textoAtual += "\n\n";
-      mensagem.innerHTML = textoAtual + '<span class="cursor">|</span>';
-      linhaAtual++;
-      charAtual = 0;
-      setTimeout(digitarTexto, 300); // pausa menor entre linhas
-    }
-  } else {
-    mensagem.innerHTML = textoAtual;
-    const sign = document.createElement("div");
-    sign.className = "assinatura";
-    sign.textContent = assinatura;
-    mensagem.appendChild(sign);
-    setTimeout(()=>{ sign.style.opacity=1 }, 800);
-  }
-}
-
-// ================= NEVE =================
-function criarNeve() {
-  const floco = document.createElement("div");
-  floco.className = "snowflake";
-  floco.innerHTML = "❄";
-  floco.style.left = Math.random() * window.innerWidth + "px";
-  floco.style.animationDuration = (6 + Math.random() * 6) + "s";
-  floco.style.fontSize = (10 + Math.random() * 18) + "px";
-  document.body.appendChild(floco);
-  setTimeout(() => floco.remove(), 12000);
-}
-setInterval(criarNeve, 350);
-
-// ================= DEBUG =================
-document.getElementById("debugInput").addEventListener("keydown", (e)=>{
-  if(e.key==="Enter"){
-    if(e.target.value.trim().toLowerCase()==="flor de gyovana"){
-      debugForcar=true;
-      e.target.value="";
-      e.target.placeholder="✔ comando aceito";
-      atualizar();
-    } else e.target.value="";
-  }
-});
-
-// ================= BOTÃO REVELAR =================
-revealButton.addEventListener("click", ()=>{
-  audioBackground.play().catch(()=>{});
-});
-
-// ================= INICIAL =================
-if(localStorage.getItem(storageKey)==="true") {
-  iniciarRevelacao();
-} else {
-  setInterval(atualizar, 1000);
-  atualizar();
-}
+if(localStorage.getItem(storageKey)==="true") iniciarRevelacao();
 </script>
 
 </body>
