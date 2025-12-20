@@ -223,21 +223,25 @@ document.body.addEventListener('click', ()=>{
 });
 
 // ================= FUNÇÃO PRINCIPAL =================
-function atualizar() {
+function atualizar(){
   const agora = new Date();
 
-  if(debugForcar && !revelando){ iniciarRevelacao(); return; }
-
-  if(agora >= dataLiberacao){
-    contador.innerHTML = "✨ A mensagem foi revelada ✨";
-    if(!revelando) iniciarRevelacao();
-    return;
-  }
-
-  if(!revelando){
+  // Sempre mostrar texto cifrado antes da data
+  if(!revelando && agora < dataLiberacao){
     mensagem.innerHTML = `<p class="hidden">${textoCifrado}</p>`;
   }
 
+  // Debug ou botão clicado
+  if(debugForcar && !revelando){ iniciarRevelacao(); return; }
+
+  // Chegou a hora da revelação
+  if(agora >= dataLiberacao && !revelando){
+    iniciarRevelacao();
+    contador.innerHTML = "✨ A mensagem foi revelada ✨";
+    return;
+  }
+
+  // Contador regressivo
   const diff = dataLiberacao - agora;
   const d = Math.floor(diff/1000/60/60/24);
   const h = Math.floor((diff/1000/60/60)%24);
