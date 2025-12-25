@@ -6,69 +6,87 @@
 <title>🎄 Uma Mensagem está esperando por você 🎄</title>
 
 <style>
-body{
-  margin:0;
-  background:radial-gradient(circle at top,#132f22,#030b06);
-  color:#f3f7f5;
-  font-family:'Georgia',serif;
-  overflow-x:hidden;
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #132f22, #030b06);
+  color: #f3f7f5;
+  font-family: 'Georgia', serif;
+  overflow-x: hidden;
 }
-.container{
-  max-width:820px;
-  margin:60px auto;
-  padding:28px;
-  background:rgba(0,0,0,.55);
-  border-radius:14px;
-  box-shadow:0 0 30px rgba(255,255,255,.08);
-  text-align:center;
-  line-height:1.6em;
-}
-.contador{margin:20px 0;font-size:1.1em;color:#d7ede2}
-.hidden{opacity:.15}
-.cursor{animation:blink 1s infinite}
-@keyframes blink{50%{opacity:0}}
 
-.snowflake{
-  position:fixed;
-  top:-10px;
-  color:#fff;
-  opacity:.7;
-  pointer-events:none;
-  animation:fall linear infinite;
+.container {
+  max-width: 820px;
+  margin: 60px auto;
+  padding: 28px;
+  background: rgba(0,0,0,0.55);
+  border-radius: 14px;
+  text-align: center;
 }
-@keyframes fall{to{transform:translateY(110vh)}}
 
+.contador { margin: 20px 0; }
+.hidden { opacity: 0.15; }
+
+#revealButton {
+  margin: 20px auto;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.assinatura {
+  text-align: right;
+  margin-top: 40px;
+  font-style: italic;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+
+.cursor { animation: blink 1s infinite; }
+@keyframes blink { 50%{opacity:0} }
+
+.snowflake {
+  position: fixed;
+  top: -10px;
+  pointer-events: none;
+  animation: fall linear infinite;
+}
+@keyframes fall { to { transform: translateY(110vh); } }
+
+#debugBox {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  opacity: 0.15;
+}
+#debugInput {
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  border: none;
+  padding: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🎄 Algo especial está guardado aqui 🎁</h1>
+  <div class="contador" id="contador"></div>
+  <button id="revealButton">▶️ Play áudio 🎶</button>
+  <div id="mensagem"></div>
+</div>
+
+<div id="debugBox">
+  <input id="debugInput" placeholder="⌘ comando secreto">
+</div>
+
+<audio id="audioBackground" loop src="background.mp3"></audio>
+<audio id="audioReveal" src="reveal.mp3"></audio>
 
 <script>
 // ================= CONFIG =================
 const dataLiberacao = new Date(2025,11,25,0,20,0);
-
-// ================= TEXTOS =================
-const textoCodificado = [
-  "Jó fócz ra ykdf oco wd yfbmzje t qf hhvuzra zy mcsso ptyo.",
-  "Czsks hqt qbt tchg vvtt eukpbcra, fqpfyo avtrdzmrr."
-];
-
-const linhas = [
-  "Há algo em você que me acalma e ilumina minhas manhãs.",
-  "Algo que não pede explicação, apenas presença.",
-  "Hoje, neste Natal, e sempre. 🎄✨"
-];
-
-const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
-
-// ================= ELEMENTOS =================
-const mensagem = document.getElementById("mensagem");
-const contador = document.getElementById("contador");
-const audioReveal = document.getElementById("audioReveal");
-audioReveal.src = "reveal.mp3";
-
-// ================= ESTADO =================
-let revelacaoOficialAtiva = false;
-
-<script>
-// ================= CONFIG =================
-const dataLiberacao = new Date(2025,11,25,0,28,0);
 const storageKey = "mensagemNatalRevelada";
 
 // ================= TEXTOS =================
@@ -155,98 +173,118 @@ const assinatura = "— Do seu Tabacudo de São Paulo, S. Luiz";
 // ================= ELEMENTOS =================
 const mensagem = document.getElementById("mensagem");
 const contador = document.getElementById("contador");
+const audioBackground = document.getElementById("audioBackground");
 const audioReveal = document.getElementById("audioReveal");
-audioReveal.src = "reveal.mp3";
 
-// ================= ESTADO =================
-let revelacaoOficialAtiva = false;
-
-// ================= CONTADOR =================
-function atualizarContador(){
-  const agora = new Date();
-  if(agora < dataLiberacao){
-    const diff = dataLiberacao - agora;
-    const d=Math.floor(diff/86400000);
-    const h=Math.floor(diff/3600000)%24;
-    const m=Math.floor(diff/60000)%60;
-    const s=Math.floor(diff/1000)%60;
-    contador.innerHTML=`⏳ Algo será revelado em ${d}d ${h}h ${m}m ${s}s`;
-  }else{
-    contador.innerHTML="✨ A mensagem foi revelada ✨";
-    if(!revelacaoOficialAtiva) iniciarRevelacaoOficial();
-  }
-}
+let revelando = false;
+let debugAtivo = false;
 
 // ================= TEXTO CODIFICADO =================
-function mostrarCodificado(){
+function mostrarCodificado() {
   mensagem.innerHTML = textoCodificado.map(l=>`<p class="hidden">${l}</p>`).join("");
 }
 
-// ================= REVELAÇÃO OFICIAL =================
-let li=0,ch=0,texto="",rodando=false;
-const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+// ================= CONTADOR =================
+function atualizar() {
+  const agora = new Date();
 
-function iniciarRevelacaoOficial(){
-  revelacaoOficialAtiva=true;
-  audioReveal.play().catch(()=>{});
-  mensagem.innerHTML="";
-  li=0;ch=0;texto="";
-  digitar();
-}
+  if (localStorage.getItem(storageKey)==="true") {
+    if (!revelando) iniciarRevelacao(false);
+    contador.innerHTML = "✨ A mensagem foi revelada ✨";
+    return;
+  }
 
-function digitar(){
-  if(li<linhas.length){
-    if(ch<linhas[li].length){
-      mensagem.innerHTML = texto + chars[Math.floor(Math.random()*chars.length)] + "<span class='cursor'>|</span>";
-      setTimeout(()=>{
-        texto+=linhas[li][ch++];
-        digitar();
-      },25);
-    }else{
-      texto+="<br><br>";
-      li++;ch=0;
-      setTimeout(digitar,300);
-    }
-  }else{
-    mensagem.innerHTML = texto + `<div style="margin-top:40px;font-style:italic">${assinatura}</div>`;
+  if (agora < dataLiberacao) {
+    mostrarCodificado();
+    const diff = dataLiberacao - agora;
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor(diff/3600000)%24;
+    const m = Math.floor(diff/60000)%60;
+    const s = Math.floor(diff/1000)%60;
+    contador.innerHTML = `⏳ ${d}d ${h}h ${m}m ${s}s`;
+  } else {
+    localStorage.setItem(storageKey,"true");
+    iniciarRevelacao(false);
   }
 }
 
-// ================= DEBUG (SIMULAÇÃO) =================
-document.getElementById("debugInput").addEventListener("keydown",e=>{
+// ================= REVELAÇÃO =================
+const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+function rand(){return chars[Math.floor(Math.random()*chars.length)]}
+
+let li=0, ci=0, texto="";
+
+function iniciarRevelacao(debug){
+  revelando = true;
+  debugAtivo = debug;
+
+  mensagem.innerHTML="";
+  audioBackground.pause();
+  audioReveal.play().catch(()=>{});
+
+  li=0; ci=0; texto="";
+  digitar(debug);
+}
+
+function digitar(debug){
+  if(li>=linhas.length){
+    mensagem.innerHTML=texto;
+    const s=document.createElement("div");
+    s.className="assinatura";
+    s.textContent=assinatura;
+    mensagem.appendChild(s);
+    setTimeout(()=>s.style.opacity=1,800);
+
+    if(debug){
+      setTimeout(()=>{
+        debugAtivo=false;
+        revelando=false;
+        mostrarCodificado();
+        audioReveal.pause();
+      },3000);
+    }
+    return;
+  }
+
+  const linha=linhas[li];
+  if(ci<linha.length){
+    mensagem.innerHTML=texto+rand()+"<span class='cursor'>|</span>";
+    setTimeout(()=>{
+      texto+=linha[ci++];
+      digitar(debug);
+    },40);
+  }else{
+    texto+="\n\n";
+    li++; ci=0;
+    setTimeout(()=>digitar(debug),300);
+  }
+}
+
+// ================= DEBUG =================
+debugInput.addEventListener("keydown",e=>{
   if(e.key==="Enter" && e.target.value.toLowerCase()==="flor de gyovana"){
     e.target.value="";
-    simularRevelacao();
+    iniciarRevelacao(true);
   }
 });
 
-function simularRevelacao(){
-  audioReveal.currentTime=0;
-  audioReveal.play().catch(()=>{});
-  mensagem.innerHTML=linhas.join("<br><br>");
-  setTimeout(()=>{
-    audioReveal.pause();
-    audioReveal.currentTime=0;
-    mostrarCodificado();
-  },120000); // 2 minutos
-}
+// ================= BOTÃO =================
+revealButton.onclick=()=>audioBackground.play().catch(()=>{});
 
 // ================= NEVE =================
 setInterval(()=>{
   const f=document.createElement("div");
   f.className="snowflake";
-  f.innerHTML="❄";
+  f.textContent="❄";
   f.style.left=Math.random()*innerWidth+"px";
-  f.style.fontSize=10+Math.random()*18+"px";
   f.style.animationDuration=6+Math.random()*6+"s";
   document.body.appendChild(f);
   setTimeout(()=>f.remove(),12000);
 },350);
 
 // ================= START =================
-mostrarCodificado();
-setInterval(atualizarContador,1000);
-atualizarContador();
+setInterval(atualizar,1000);
+atualizar();
 </script>
 
 </body>
